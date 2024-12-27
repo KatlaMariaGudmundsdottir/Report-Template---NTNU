@@ -2,10 +2,33 @@
 %=================================================================
 %                           Start Document
 %=================================================================
-\section{Innledning - Problemstilling}
-\lhead{Innledning - Problemstilling} % section header
+\section{Introduction }
+\lhead{Introduction} % section header
 
-gg
+\setstretch{1.6}
+
+\subsection{Project background}
+
+\subsection{Project Context}
+This project builds upon an ongoing effort at the REHassist lab at EPFL for developing hybrid strategies using robotics and Functional Electrical Stimulation (FES) for treating neurological motor disorders such as stroke, cerebral palsy and spinal cord injury. 
+
+Importantly this project uses hardware previously developed at the REHassist lab. Firstly the StimWave3 which is a custom, 20 channel, electrostimulator. It can generate continuous or pulsed currents with adjustable frequency, pulse width, and amplitude. Secondly there are the wireless IMUs that output angular velocity and acceleration along three axis. 
+
+Software wise, there is a codebase that has been developed for hybrid FES robotics strategies using the StimWave hardware. Specifically there is a codebase that was used for FES with a Leg-Press robotic trainer called LegoPress \cite{olivier_legopress_2014}. That code was adapted last semester by another student for the closed loop gait application. A goal of this project is to further develop that code. However, a part of that must include refactoring of this code. This is because the closed loop control logic was implemented on top of the legopress logic and everything was effectively implemented in one file leading to poor code quality. This is further expanded upon in the implementation section on refactoring.
+
+
+
+\todo{finish and rewrite}
+
+\subsection{Motivation}
+
+\subsection{Project limitation}
+
+\subsection{Contribution}
+
+\subsection{Project overview}
+
+
 
 %==============================================================
 %                           End Document
