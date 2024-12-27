@@ -162,17 +162,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand*\FirstPage{
+% \thispagestyle{empty}
+% % placing a pdf as background and adding text on top
+% \includepdf[pages=1,picturecommand*={ 
+%                 % selecting placement, font size and text type
+%                 \put(130,630){\fontsize{28}{28}\selectfont{\textsc{\textbf{Control strategies for FES drive gait rehabilitation}}}}
+%                 \put(130,200){\fontsize{28}{28}\selectfont{\Large{\textbf{Teknisk rapportmal}}}}
+%                 \put(130,180){\fontsize{28}{28}\selectfont{\Large{\textbf{NTNU studenter}}}}
+%                 \put(130,160){\fontsize{28}{28}\selectfont{\Large{\textbf{Trondheim, vår 2020}}}}
+%                 }]{images/ntnu_front_page.pdf}}
+
 \thispagestyle{empty}
 % placing a pdf as background and adding text on top
 \includepdf[pages=1,picturecommand*={ 
                 % selecting placement, font size and text type
-                \put(130,630){\fontsize{28}{28}\selectfont{\textsc{\textbf{Spicy Title}}}}
+                \put(130,630){\parbox{400pt}{\centering % Multi-line title with centering
+                    \fontsize{28}{34}\selectfont{\textsc{\textbf{Control strategies for FES drive gait rehabilitation}}}}}
                 \put(130,200){\fontsize{28}{28}\selectfont{\Large{\textbf{Teknisk rapportmal}}}}
                 \put(130,180){\fontsize{28}{28}\selectfont{\Large{\textbf{NTNU studenter}}}}
                 \put(130,160){\fontsize{28}{28}\selectfont{\Large{\textbf{Trondheim, vår 2020}}}}
+                % Adding spaces for supervisor and helper supervisor names
+                \put(130,120){\fontsize{20}{24}\selectfont{\textbf{Supervisor:}}}
+                \put(130,100){\fontsize{20}{24}\selectfont{\textbf{Helper Supervisor:}}}
                 }]{images/ntnu_front_page.pdf}}
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   Command for the second page
@@ -270,3 +282,27 @@
 \addbibresource{references.bib}
 \setlength\bibitemsep{1.5\itemsep}% makes space between references
 \usepackage{csquotes} %lagt til for warning
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                       Katlas settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% figures
+\usepackage{graphicx}
+\usepackage{epstopdf}
+
+\usepackage{siunitx}% Si-units
+
+\usepackage{tabularx}% Tables
+
+\usepackage{wrapfig}% Wrapping text around figures or tables
+
+\usepackage{float} % Placements of figures and tables
+
+\usepackage{multicol}% To be able to have multiple columns
+
+\usepackage{xcolor}% Text colour
+
+\usepackage{listings}% Import codes directly
+
+\counterwithin{figure}{section} %figures gets names according to chapters, example Fig 1.1, 1.2, 2.1, etc. in stead of Fig 1, 2, 3 etc.
