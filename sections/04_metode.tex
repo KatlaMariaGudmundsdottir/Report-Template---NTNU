@@ -130,6 +130,9 @@ Initially, it was beleived that a working open loop sequence had already been es
 This initial sequence was based on electromyography (EMG) measurements of muscle activation during gait in two healthy subject. Therefore to evalueate the accuracy of the sequence the EMG measurements from the two subjects were compaired against a comprehensice, open-source dataset of EMG activity during gait \cite{camargo_comprehensive_2021}. The discrepancies between the two became immediately apparent. In gait phases where the dataset indicated that certain muscles-such as the vastus medialis, hamstrings,and gluteus maximus-should be largely inactive the EMG measurement from the two subjects showed significant activation. There are several likely causes for these inaccuracies uncluding noise, motion artifacts or the EMG sensors picking up activity from muscles. Since the stimulation sequence was based directly on this flawed data several muscles were being stimulated during periods where they should be entierly inactive. This is what lead to the failure of the sequence in reproducing a natural and functional gait cycle. Having confirmed that the issue lay in the sequence itself, rather than its implementation, the focus was shifted to designing an entirely new stimulation sequence.
 
 \subsubsection{Finding a new sequence}
+
+\textit{Graphical User Interface}
+
 To facilitate the testing and tuning of new stimulation sequences a new graphical user interface (GUI) tab (figure \ref{fig:sequenceGUI})was created. This interface allowed real-time adjustments not only to the durations and delayes but also the sequence of the muscles. This is done by relating each muscle to a specific channel. This significantly accelerated the iterative process of testing and optimizing sequences. 
 
 \begin{figure} [h]
@@ -139,9 +142,49 @@ To facilitate the testing and tuning of new stimulation sequences a new graphica
     \label{fig:sequenceGUI}
 \end{figure}
 
+\textit{Methodology}
+
 In order to design a new sequence that would be robust literature insights from the literature relating to FES for gait and a seminal text on gait physiology were used. To ensure that the sequence aligned with natural muscle activation patterns, the seminal text \textit{Gait Anlysis: Normal and Pathological function} \cite{perry_gait_2024} was consulted. This book provides comprehensive descriptions of muscle activity throughout the gait cycle with exact start and top percentages of the gait cycle for nearly all lower extremity muscles during gait. However the gait stimulation sequence could not be based only on this. It would be impossible to stimulate every muscle individually as they are activated naturally, there are simply too many muscles and FES does not have the necessary selectivity to accomplish that. Unlike voluntary contractions, which selectively and smoothly activate specific motor units, FES broadly stimulates motor nerves, often activating muscles indiscriminately. Therefore it was necessary to choose only a few muscles to stimulate and to determine this the existing literature relating to FES was examined.
 
-The literature ( \todo{sources}) revealed a large variety in the sequences used in FES gait studies. The timing end exact muscles varied greatly, however, the number of muscles was relatively consistent between four and eight and the tibialis anterior, gastrocnemis and biceps femoris (hamstring) appeared consistently in nearly all implementations. Other common muscles included the Rectus Femoris and the Gluteus Maximus. Several sequences inspired by physiological insights and the literature were tested. First a sequence with six m
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/common_muscles.png}
+    \caption{Common muscles used for FES driven gait}
+    \label{fig:commonMuscles}
+\end{figure}
+
+The literature ( \todo{sources}) revealed a large variety in the sequences used in FES gait studies. The timing end exact muscles varied greatly, however, the number of muscles was relatively consistent between four and eight and the tibialis anterior, gastrocnemis and biceps femoris (hamstring) appeared consistently in nearly all implementations. A list and visualization of the most common muscles is shown in figure \ref{fig:commonMuscles}. Several sequences inspired by physiological insights and the literature were tested. 
+\newline \newline
+
+
+\subsubsection{Six muscle Sequence}
+
+First a sequence with six muscles: Tibialis Anterior, Gastrocnemi, Vastus Medialis, Hamstrings, Gastrocnemi and the Gluteus Maximus, was tested. This was the first sequence that produced a step. 
+
+\subsubsection{Five muscle sequence}
+The next sequence tested did not include the gluteus maximus, this was done to see whether the gluteus was necessary to stimulate. It had been pointed out by collegues experienced with running FES on patients that patients typically find the stimulation and placement process for the gluteus to be both challenging and uncomfortable. 
+
+The hypothesis was that the gluteus Maximus may not be necessary to stimulate since several studies using FES to produce gait did not include the gluteus muscles ( \cite{aout_effects_2023} \todo{sources}). There are several reasons as to why the gluteus maximus, although important in natural gait, may not be necessary to stimulate. The first is muscle compensation. The gluteus is mostly involved in hip stabilization and hip extension. However the hamstring stimulation provides som hip extension that may be sufficient \todo{source}. The second is that the gluteus is primarily active during activities that require powerful hip extension such as climbing stairs or running \todo{source}. For flat ground however, especially at slower speeds the gluteus may play a smaller role. 
+
+This new sequence also produced a step that did not seem of a lower quality than the sequence that included the gluteus. The stimulation was also noted to be more comfortable without the gluteus, therefore it was decided that the gluteus could be removed from the sequence.
+
+
+
+\subsubsection{Four muscle sequence}
+Next a sequence without the Rectus Femoris was tested, this was done due to several observations. Firstly, during experiments it was observed that stimulating only the Vastus Medialis led to a full knee extension leading to questions as to why the Rectus Femoris must be stimulated as well. The rectus femoris functions in both hip flexion and knee extension during natural gait, however upon FES stimulation it mostly produces an extension. So a hypothesis was formed that they knee extension needed may be achieved through stimulation of only the Vastus Medialis which focuses solely on knee extension without impacting hip movement. Secondly on experimentation done on myself it proved difficult to find a comfortable electrode placement for rectus femoris, and stimulating the rectus femoris proved to be the most uncomfortable muscle to stimulate. This was also corrobarated as a typical experience among patients by experienced collegues. 
+Finally it was observed that there was a large discrepancy between when the Rectus Femoris was being stimulated in the literature compared to when it was active during natural gait according to the physiology. In fact in the literature it was largely being used for knee extension, while physiologically this muscle is mostly active during the initial-swing and mid-swing phases where it provides foot clearance and does not act as an extensor at all. 
+
+When testing a new sequence without the rectus femoris there was no discernible difference between the steps produced when looking at videos of the respective sequences. The sequence also proved to be more comfortable leading to the conclusion that the Rectus Femoris may be removed from the sequence. This sequence ended up being the final sequence chosen, with results on multiple subjects available in the result section on the open loop stimulation sequence.
+
+
+\subsection{IMU implementation}
+\lhead{Implementation - IMU implementation}
+
+
+
+
+
+
 
 
 
