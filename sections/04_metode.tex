@@ -130,7 +130,22 @@ Initially, it was beleived that a working open loop sequence had already been es
 This initial sequence was based on electromyography (EMG) measurements of muscle activation during gait in two healthy subject. Therefore to evalueate the accuracy of the sequence the EMG measurements from the two subjects were compaired against a comprehensice, open-source dataset of EMG activity during gait \cite{camargo_comprehensive_2021}. The discrepancies between the two became immediately apparent. In gait phases where the dataset indicated that certain muscles-such as the vastus medialis, hamstrings,and gluteus maximus-should be largely inactive the EMG measurement from the two subjects showed significant activation. There are several likely causes for these inaccuracies uncluding noise, motion artifacts or the EMG sensors picking up activity from muscles. Since the stimulation sequence was based directly on this flawed data several muscles were being stimulated during periods where they should be entierly inactive. This is what lead to the failure of the sequence in reproducing a natural and functional gait cycle. Having confirmed that the issue lay in the sequence itself, rather than its implementation, the focus was shifted to designing an entirely new stimulation sequence.
 
 \subsubsection{Finding a new sequence}
-To facilitate the testing and tuning of new stimulation sequences a new graphical user interface (GUI) tab (figure \ref{}was created. This interface allowed real-time adjustments not only to the durations and delayes but also the sequence of the muscles. This significantly accelerated the iterative process of testing and optimizing sequences. 
+To facilitate the testing and tuning of new stimulation sequences a new graphical user interface (GUI) tab (figure \ref{fig:sequenceGUI})was created. This interface allowed real-time adjustments not only to the durations and delayes but also the sequence of the muscles. This is done by relating each muscle to a specific channel. This significantly accelerated the iterative process of testing and optimizing sequences. 
+
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/sequenceGUI.png}
+    \caption{Graphical user interface for testing new sequences.}
+    \label{fig:sequenceGUI}
+\end{figure}
+
+In order to design a new sequence that would be robust literature insights from the literature relating to FES for gait and a seminal text on gait physiology were used. To ensure that the sequence aligned with natural muscle activation patterns, the seminal text \textit{Gait Anlysis: Normal and Pathological function} \cite{perry_gait_2024} was consulted. This book provides comprehensive descriptions of muscle activity throughout the gait cycle with exact start and top percentages of the gait cycle for nearly all lower extremity muscles during gait. However the gait stimulation sequence could not be based only on this. It would be impossible to stimulate every muscle individually as they are activated naturally, there are simply too many muscles and FES does not have the necessary selectivity to accomplish that. Unlike voluntary contractions, which selectively and smoothly activate specific motor units, FES broadly stimulates motor nerves, often activating muscles indiscriminately. Therefore it was necessary to choose only a few muscles to stimulate and to determine this the existing literature relating to FES was examined.
+
+The literature ( \todo{sources}) revealed a large variety in the sequences used in FES gait studies. The timing end exact muscles varied greatly, however, the number of muscles was relatively consistent between four and eight and the tibialis anterior, gastrocnemis and biceps femoris (hamstring) appeared consistently in nearly all implementations. Other common muscles included the Rectus Femoris and the Gluteus Maximus. Several sequences inspired by physiological insights and the literature were tested. First a sequence with six m
+
+
+
+
 
 
 
