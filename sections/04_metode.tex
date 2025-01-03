@@ -187,8 +187,295 @@ Finally it was observed that there was a large discrepancy between when the Rect
 When testing a new sequence without the rectus femoris there was no discernible difference between the steps produced when looking at videos of the respective sequences. The sequence also proved to be more comfortable leading to the conclusion that the Rectus Femoris may be removed from the sequence. This sequence visualized in figure \ref{fig:fianlsequence} ended up being the final sequence chosen, with results on multiple subjects available in the result section on the open loop stimulation sequence.
 
 
-\subsection{IMU implementation}
+
 \lhead{Implementation - IMU implementation}
+\subsection{IMU implementation}
+\begin{wrapfigure}{r}{0.5\textwidth}
+        \centering
+    \includegraphics[width=\linewidth]{images/IMU_directions.png}
+    \caption{New wireless IMU}
+    \label{fig:imudirection}
+\end{wrapfigure}
+A part of the project involved replacing the old wired IMUs used by the previous student, with new wireless IMUs developed at the laboratory. These new IMUs enhance the portability and adaptability of the system, making them better suited for this application. They feature a high sampling frequency of 1kHz, and are capable of communicating using the Lab Streaming Layer (LSL) protocol. LSL is a real-time communication framework that allows data from multiple devices to be syncronized and recorded with low latency \todo{source}. The IMUs continuously transmit acceleration and angular velocity data via LSL, providing a high-resolution stream of motion information.
+
+The transition to wireless IMUs required adapting the C++ code base to be able to receive the LSL-based data streams. Code from students working on gait phase detection in Python provided a starting point, as it already included functionality for connecting to the IMUs and accessing the data streams. The primary task was therefore to replicate and adapt this functionality in C++ in the refactored codebase. This involved setting up connections to the LSL streams emitted by the IMUs. Each device was configured as an independent source, transmitting real-time data. Modular code using threading was developed to ensure that the connection setup, data acquisition and processing could handle multiple IMUs simultaneously. The use of multithreading ensured that data from each IMU could be processed concurrently. 
+
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/imugui1.png}
+    \caption{Graphical User Interface for visualizing IMU values}
+    \label{fig:imugui}
+\end{figure}
+
+A new tab for the GUI was also created in order to visualize the data in real time. A screenshot of the GUI can be seen in figure \ref{fig:imugui}. There were four IMUs available at the laboratory designated A, B, C and D and in the code these IMUs are assigned as either left or right, shank or thigh IMUs. This mapping may easily be changed, which is useful when working with wireless IMUs that need regular charging. The connect button trigger creation of a new instance of the IMU class and a new thread on which the data is processed and then sendt back to be visualized in the "TextLabel" fields.
+
+\subsection{Knee Angle Estimation}
+The feedback for the closed-loop control system was designed to rely on the knee angle, it was therefore necesary to implement a robust method of extracting the knee angle from the IMU measurements. This was done by mounting one IMU on the shank and onther on the thigh. The angle between these two segments could then be calculated using the relative orientation of the IMUs. However, determining this angle requires an algorithm capable of providing accurate, low-latency orientation estimates. 
+
+
+\subsubsection{Algorithm Selection}
+Simple integration of gyroscope data is not viable since the integration process in inherently sensitive to small inaccuracies in the gyroscope output which accumulate over time, causing the orientation to deviate from the true value - a phenomenon known as drift. These inaccuracies are inevitable not only because of the noise affecting IMU but also since this is a highly dynamic system. Therefore sensor fusion algorithms had to be evaluated.
+
+It has been demonstrated in many publications (e.g. \cite{peng_cheng_joint-angle_2010}, \cite{sabatini_estimating_2011} and the sources therein) that IMU data can be used to calculate hinge joint angles. Hinge joint angles can be calculated by integrating the difference of both angular rates around the corresponding coordinate axis and several techniques have been suggested to eliminate drift using accelerometers \cite{peng_cheng_joint-angle_2010}. As time for this project is limited it was a priority to find an algorithm that would not be very time consuming to implement. Towards this end a popular python library named \textit{Attitude and Heading Reference Systems (AHRS)} \cite{noauthor_ahrs_nodate} was consulted with the aim of using the python implementations as starting off point for the necessary C++ implementation. Here three selected methods are compared and contrasted for this particular application. Three methods were selected based on their applicability, robustness and ease of implementation. 
+
+
+
+\subsubsection{Madgwick Filter}
+
+The Madgwick filter is a gradient-descent-based orientation estimation algorithm. It provides a computationally efficient framework to estimate the orientation based on using gyroscope data for the prediction step and accelerometer data for the correction step. 
+
+\textit{Theoretical Implementation}
+The Madgwick filter would be implemented on the thigh and shank IMUs individually. The implementation outlined here is adapted from the original internal report by S. Madgwick  \cite{madgwick_ecient_nodate} and the documentation of the AHRS implementation \cite{noauthor_madgwick_nodate}. In the madgwick filter the orientation of the sensor frame relative to the earth frame is represented as a quaternion \( \mathbf{q_{\omega , t}} \):
+\[
+\mathbf{q_{\omega , t}} = 
+\begin{bmatrix}
+q_w & q_x & q_y & q_z
+\end{bmatrix}^T
+\]
+where \( q_w \) is the scalar part, and \( q_x, q_y, q_z \) are the vector components.
+
+\textit{Prediction step: Integration of Angular Velocity}
+
+The orientation quaternion is predicted by numerically integrating integrating the quaternion derivative 
+\(
+\dot{\mathbf{q}}_t = \frac{1}{2} \mathbf{q}_{t-1} \otimes \boldsymbol{\omega}_t
+\) as:
+\[
+\mathbf{q}_{\omega, t} = \mathbf{q}_{t-1} + \dot{\mathbf{q}}_{\omega, t} \Delta t
+\]
+\[
+\mathbf{q}_{\omega, t} = \mathbf{q}_{t-1} + \frac{1}{2} \left( \mathbf{q}_{t-1} \otimes \mathbf{S}\boldsymbol{\omega}_t \right) \Delta t
+\]
+where \( \Delta t \) is the sampling period and 
+\(
+\mathbf{S}\boldsymbol{\omega} = 
+\begin{bmatrix}
+0 & \omega_x & \omega_y & \omega_z
+\end{bmatrix}
+\)
+is the tri-axial angular rate, in rad/s, measured in the sensor frame and represented as a pure quaternion. For a more detailed explanation on orientation estimation based solely on angular rate and quaternion kinematics the reader is referred to \cite{sola_quaternion_2017}.
+
+\textit{Correction step: Gradient Descent}
+To correct for gyroscope drift, the Madgwick filter uses accelerometer data to align the predicted gravity vector with the measure gravity vector. The objective funciton minimizes the error between the two:
+\[
+f(\mathbf{q}) = \mathbf{q}^* \otimes \mathbf{g} \otimes \mathbf{q} - \mathbf{a}
+\]
+
+Where  \( \mathbf{q}^* \) is the conjugate of the predicted quaternion. The reference gravity vector in the Earth frame is \(\mathbf{g} = [0, 0, 0, 1].\) and the normalized accelerometer measurement is
+    \(
+    \mathbf{a} = [0, a_x, a_y, a_z].
+    \)
+
+The gradient of the objective function is computed as:
+\[
+\nabla f(\mathbf{q}) = \mathbf{J}^T f(\mathbf{q})
+\]
+
+where \( \mathbf{J} \) is the Jacobian matrix of the objective function.
+
+The corrected quaternion is updated using a gradient descent step:
+\[
+\mathbf{q}_{k+1} = \mathbf{q}_k - \mu \frac{\nabla f(\mathbf{q})}{\|\nabla f(\mathbf{q})\|}
+\]
+
+where \( \mu \) is the step size (gain), which controls the convergence rate.
+
+
+\textit{Application to Knee Angle Estimation}
+
+ The algorithm is used to estimate the orientation of each IMU relative to the Earth frame, yielding quaternions \( \mathbf{q}_{\text{thigh}} \) and \( \mathbf{q}_{\text{shank}} \). The knee angle is then computed as the relative orientation between the two IMUs.
+The relative orientation quaternion is calculated as:
+\[
+\mathbf{q}_{\text{relative}} = \mathbf{q}_{\text{shank}} \otimes \mathbf{q}_{\text{thigh}}^*,
+\]
+where \( \mathbf{q}_{\text{thigh}}^* \) is the conjugate of \( \mathbf{q}_{\text{thigh}} \).
+
+The knee angle \( \theta \) is derived from the relative orientation quaternion:
+\[
+\theta = \arccos{\left( 2q_w^2 - 1 \right)},
+\]
+where \( q_w \) is the scalar component of \( \mathbf{q}_{\text{relative}} \).
+
+\textit{Evaluation}
+
+The main advantages of the Madgwick filter are that it is computationally efficient, especially designed for low cost, noisy IMUs, does not introduce potentially problematic delays, it's theoretically robust due to the correction step, the quaternion-based representation avoids singularities associated with euler angles. However there are some potential limitations. It might be sensitive to accelerometer noise such as during foot strikes. With this implementation there is also an implicit assumption that the local coordinate axes align exactly with the knee joint axis, additionally there is the assumptions that the IMUs themselves are algined. However all sensor fusion algorithm found during this project would also have required the same assumptions. Therefore because of the applicability of the algorithm, theoretical robustness and ease of implementation the Madgwick filter was selcted and adapted in order to estimate the knee angle.
+
+\subsection{Phase detection}
+
+The initial closed loop design involved the use of gait phase detection for use in determining which muscles should be stimulated. The plan was therefore to implement an on-line phase detection algorithm. This has been worked on during this same semester by another student at the lab who has been implementing a phase detection and subphase detection algorithm in python. The plan thas therefore to take the algorithm already developed and adapt it for C++ and Qt. This was thought to fit within the timeframe of the project only since the hope was that it would quite straight forward to simply translate the python algorithm and run it on a separate thread.
+
+\subsubsection{The Algorithm}
+\todo{write a description of the algorithm by francesco}
+
+\subsubsection{Implementation}
+
+Once this task was started on however it became clear that it would not be as simple as hoped to implement. The issue was that the python implementation used a host of SciPy \cite{noauthor_scipy_nodate} functions in order to implement the algorithm. Scipy is a  widely used library for scientific computing in Python, providing modules for among other things signal processing. Unfortunately, no equicalent comprehensive library exists for C++ thaty could directly replace SciPy's functionality. After an extensive search for alternatives, it became clear that replicating the necessary SciPy functions would be unavoidable.
+
+To address this, a new class, "GaitPhaseDetector" \todo {make into code text}, was created to house the custom utility functions and the detction algorithm itself. It proved time consuming and challenging to ensure that the new functions matched the exact functionality of the SciPy functions. Having the new functions match exactly the SciPy functionality was hugely important since the entire gait phase and subphase algorithm had been built and tuned based on the usage of these functions. Many of the SciPy functions depended on nested calls to other SciPy utilities and the logic could be challenging to interperet. Despite these challenges, the class was developed and initial results were promising, indicating some degree of success in detecting the peaks needed to then detect the phases of gait. 
+
+\todo{figure of peaks}
+
+However, upon further testing, it became clear that the results were inconsistent and unreliable. A possible contributing factor here might be the potential discrepancies in the implementation of the SciPy functions. Despite thorough efforts to accurately replicate the functionality, subtle differences likely persisted which can have impacted the algorithm's performance. 
+
+Another major challenge was the need to retune some of the algorithm parameters. The detection algorithm has been meticulously tuned throughout months of work to achieve a reliable and generalizable gait phase detector. The parameters include thresholds for metrics such as peak widths, which were defined as the number of data entries on either side of a peak. This posed  a significant challenge during adaptation since even when the C++ implementation exactly replecated the method in which data aquisition was managed in the Python implementation ( stream inlet in while loop) the frequency of incoming data differed. This discrepancy necessitates the retuning of all parameters that rely on counting the number of data points. This is a time consuming process. This issue as well as the issue of replicating 
+
+While the adaptation of the Python-based gait phase detection algorithm to C++ initially appeared feasible within the project
+s timeframe, the complexity of replicating SciPy's functionality and retuning the algorithm's parameters introduces significant challenges leading to the conclusion that implementing on-line gait phase detection would not be feasible within the time-frame of the project. However the initial implementation of the GaitPhaseDetector class is implemented with the architecture and stands ready to be more further developed and finished by later students.
+
+\subsection{Closed-Loop}
+A closed-loop control system was implemented in order to improve the quality of the stimulated step while also minimizing fatigue. This was achieved by dynamically adjusting the current amplitude by using a  PI controller dynamically adjust the current amplitude so that only the required current to induce the desired movement was applied. The final closed-loop design takes into account the lack of a viable phase detection algorithm, as discussed previously. Instead, the system relies solely on knee angle feedback and uses a time-dependent reference knee angle.
+
+\subsubsection{Closed-Loop design}
+\todo{closed loop figure}
+A visualization of the closed loop control flow can be seen in figure \todo{put in figure reference}. The closed-loop takes in a knee angle reference that is fetched based on the current time and the gait cycle duration from the knee angle reference curve. Based on the the current time and gait cycle duration the current gait cycle percentage is extracted and used to determine which subphase of the gait the system should be in, based on this the muscles to stimulate are determined. The muscles that correlate to each subphase are based on the open-loop stimulation sequence, and can be seen in figure \todo{create figure for muscles}. Then for each muscle that should be stimulated a PI tuned for that specific muscle is run and there is a feedforward current that is summed with the PI current in order to get the current that will be sent to the StimWave board which then stimulates the muscles of the user. From the IMUs attached to the thigh and shank of the leg that should be stimulated the knee angle is then extracted and used as a feedback. A picture of the electrode and IMU placements on a single subject can be seen in figure \todo{ref}.
+
+\todo{IMU and electrode placement picture}
+
+
+\subsubsection{Knee Angle Reference Curve}
+In order to use the error in knee angle as an input for the PI control it is important to have a good reference. Thankfully there is a lot of collected data on knee range of motion during gait. Knee range of motion has a specific curve during the gait cycle \todo{source}, a typical example can be seen in figure \todo{figure reference} 
+\todo{knee angle curve figure}
+\newline 
+
+\textit{Simplified Curve}
+
+Two different approaches to creating the reference curve were attempted. The first involved simply re-creating the general shape and amplitude of the typical knee angle curve by combination of two sinus curves tuned by-hand. The resulting curve modeled as the sum of two sinusoidal components, defined as:
+\[
+y(x) =
+\begin{cases}
+A_1 \sin\left(2 \pi f_1 x + \phi_1\right) + C_1, & 0 \leq x \leq 40 \\
+A_2 \sin\left(2 \pi f_2 x + \phi_2\right) + C_2, & x > 40
+\end{cases}
+\]
+where the parameters are defined as:
+
+For the first bump:
+\[
+A_1 = 11, \quad f_1 = \frac{0.1}{4}, \quad \phi_1 = \frac{\pi}{2} + 2\pi f_1 \cdot 20, \quad C_1 = 15
+\]
+
+For the second bump:
+\[
+A_2 = 30, \quad f_2 = \frac{0.1}{6}, \quad \phi_2 = -\frac{\pi}{2} + 2\pi f_2 \cdot 80, \quad C_2 = 34
+\]
+
+A visualization of this curve can be seen in figure \todo{ref}. When comparing this however with the typical knee angle curve there are some major differences such as the height of the end of the second sinus curbe and height of the valley between the two curves. Because of these discrepancies another approach was attempted.
+\todo{simple curve figure}
+\newline
+
+\textit{Fitted Curve}
+
+The second approach was based on extracting the curve by fitting a fourier series to the measured knee angle data during gait. A fourier series fitting is .... . Readers that unfamiliar with fourier series fitting are referred to \todo{source}. The data used for the fitting is from the open source data set of gait analysis measurements by camargo et al. \cite{camargo_comprehensive_2021}. For that dataset several subjects were fitted with, among other things, a goniometer attached to the knee angle in order to get exact measurements of the knee angle during walking on a treadmill. 
+
+\todo{Knee angle fitted curve figure}
+
+For extracting the curve a single dataset at t a single speed (approximately 1 m/s) was used. Then a Fourier seris is used to approcimate the periodic knee angle data. The series is expressed mathematically as:
+\begin{equation}
+f(x) = a_0 + \sum_{i=1}^{n} \left( a_i \cos(2\pi i x) + b_i \sin(2\pi i x) \right)
+\end{equation}
+
+\begin{itemize}
+    \item \(a_0\) is the constant offset (mean value of the function).
+    \item \(a_i\) and \(b_i\) are the Fourier coefficients for the cosine and sine terms, respectively.
+    \item \(n\) is the number of harmonics, which determines the complexity of the approximation.
+\end{itemize}
+
+In order to extract coefficient that best fit the data \texttt{curve\_fit}  function from \texttt{SciPy} is used. the number of harmonics (\textit{n}) is set to 3 in porder to balance accuracy and computational efficiency. This number provides enough flexibility to capture the primary general shape of the motion without overfitting to noise or adding unnecessary complexity. The  final curve is plotted alongside the original data in figre \todo{ref} which demonstartes how well the Fourier series captures the periodic behavior of the knee angle during gait. This improved resemblance to a physiological knee angle curve and since there is only a small change in computational complexity online with this more complicated equation led to the fitted curve being chosen as the curve used for the closed-loop implementation.
+\todo{Knee angle fitted curve w data figure}.
+\newline
+
+\textit{Implementation}
+
+In order to use the fitted curve as the reference for the PI controller, the knee angle corresponding to the current percentage of the gait cycle must be extracted in real time. This process begins by determining which percentage of the gait cycle the system is currently in. This is calculated using the current time and the gait cycle duration set by the user. The corresponding knee angle is then retrieved from the fitted curve. Which is then fed to the PI controller.
+
+\subsubsection{Gait Cycle Duration}
+As mentioned the reference knee angle degree value depends on the gait cycle duration and current time, therefore setting the correct gait cycle duration for each user is an important step. Gait cycle duration defines the time required for one complete stride, encompasssing the full sequence of movements from both legs. 
+
+When running the FES experiments on a treadmill this gait cycle duration will vary from user to user and is therefore important to calculate before starting the stimulation. The primary input is the treamill speed (\(v\)) in (m/s). The second essential parameter is the subjects leg length (\(L\)), measured as teh distance from the greater trochanter to te floor in meters \todo{source}. Then the Froude number (\(Fr)\) which is a widely used descriptor in gait analysis is:
+\begin{equation}
+    Fr = \frac{v^2}{g \cdot L}
+\end{equation}
+Where g is gravitational acceleration. Once the Froude number is calculated the stride frequency (\(f_s\)) can be estimated using the following relationship \todo{source}:
+\begin{equation}
+    f_s = \sqrt{\frac{g \cdot Fr}{L}}
+\end{equation}
+From which the gait cycle duration is extracted and inserted into the program to ensure that the closed loop runs on a gait cycle duration that is comfortable for the user.
+
+
+\subsubsection{PI controller}
+To dynamically adjust the current amplitude based on the error between the desired and actual knee angle, a proportional-integral (PI) controller was implemented and tuned for each muscle independently. 
+\newline
+
+\textit{Controller choice}
+
+The PI controller was chosen for its ability to address the system's specific needs.  Even though the reference angle changes over time a proportional-only controller may not adequately address persistent and steady-state errors as it only responds to the instantaneous error. Adding the integral term which accumulates error over time, effectively compensates for any consistent offset (e.g. under- or over-stimulation) that the proportional term cannot eliminate. 
+
+\todo{Dicrete PI controller figure}
+
+In a FES system, delays in muscle activation and mechnical response can cause the actual knee angle to lag behind the desired reference. By including an integral term the controller accounts for these delays indirectly: if the knee angle lags due to delayed muscle response, the accumulateed error promts the system to apply a sustained correction to minimize the offset over time.
+
+The justification for not including a derivative term is that even though the derivative term would in theory enhance the responsiveness to rapid changes it would also implify the noise in the system. The IMU measurements and subsequent knee angle calculation is noisy and including a derivative term could quickly destabilize the control loop.
+\newline 
+
+\textit{Implemetation for FES}
+
+The PI controller was implemented in the \texttt{LoopController} class based on the following discrete time equation:
+\begin{equation}
+I_{PI}(t) = 
+\begin{cases} 
+-K_p \cdot e(t) - K_i \cdot \frac{\Delta t}{2} \left(e(t) + e(t-\Delta t)\right), & \text{if extension phase} \\
+K_p \cdot e(t) + K_i \cdot \frac{\Delta t}{2} \left(e(t) + e(t-\Delta t)\right), & \text{otherwise}
+\end{cases}
+\end{equation}
+
+Where \( e(t-\Delta t) \) is the error at the previous time step. As is clear from the formula the integral term is calculated using trapezoidal integration. By averaging the error values at the start and end of the interval the trapezoidal approavh better captures the varying nature of the error compared to rectangular integration which assumes that the error remains constant during the interval \(\delta t\). It also reduces the likelihood of abrupt changes to the PI output since it accounts for error trends between time steps rather than using just the current error.
+
+The PI controller also incorporates a phase-specific adaptation. This is because in knee extension increasing the stimulation of the extensor muscles decresases the knee angle, while increased stimulation of flexion muscles will increase the knee angle. To prevent counterproductive stimulation the controller therefor inverts its output during extension.
+
+
+\subsubsection{Feedforward Current}
+A feedforward current is implemented for each muscle individually to provide a baseline stimulation amplitude, ensuring sufficient activation to induce movement. It is set around the midpoint between the motor threshold and the maximum tolerable intesity found for each muscle during setup. 
+
+Including a feedforward current is particularly beneficial in FES systems because it provides a consisten baseline for muscle activation reducing reliance on reactibe feedback adjustments and ensuring smotther, more predictable responses during the giat cycle. It also helps address delays in muscle activation and mechenical response by esnuring timely stimulation even before feedback corrections take effect. Additionally, the feedforward current reduces the workload on the feeback controller by offloading the need for large corrective actions requiring large gain values, allowing the controller to focus on fine-tuning adjustments.
+
+Finally the feedforward current contributes to minimizing muscle fatigue by ensuring that the stimulation is applied more evenly over time. This reduces the need for large corrective currents, which could otherwise lead to over-stimulation and discomfort.
+
+
+\subsubsection{FES stimulation}
+The final calculated current is the sum of the feedforward current and the PI computed current saturated for safety reasons. The maximum possible current amplitude is the maximum tolerable intensity found during the setup and is set for each muscle individually. This saturated current is sent to the StimWave which then applies the stimulation with the set current amplitude, frequency and pulse width to the electrodes for each active muscle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
 
 
 
