@@ -5,6 +5,8 @@
 \section{Vedlegg}
 \lhead{Vedlegg} % section header
 
+\setstretch{1.6}
+
 %\begin{enumerate}
  % \item URL
   %\item URL
@@ -42,6 +44,43 @@
 \caption{Class overview and functionality.}
 \label{tab:class-overview}
 \end{table}
+
+
+\subsubsection{Extended Kalman Filter}
+
+The extended kalman filter (EKF) is a widely recognized and popular state-space algorithm that utilizes a probabilistic framework for state estimation in non-linear systems. Its ability to optimally combine noisy sensor measurements with a mathematical model of the system and adaptability to non-linear dynamics makes it theoretically a robust choice for orientation estimation. This section does not go into detailed explanations on the EKF itself, but rather discusses its possible usage, readers unfamiliar with the Extended Kalman Filter are therefore referred to \todo{edmund brekke book}. The suggested implementation sketched below is inspired by \cite{sabatini_kalman-filter-based_2011} and \cite{noauthor_extended_nodate} with the main difference being the implementation here does not require magnetic sensors.
+
+
+\textit{Theoretical implementation}
+
+In this context, the state vector represents the orientation of the IMU represented as a quaternion with respect to a reference frame. The filter uses a process model to predict the next state and a measurement model to correct the prediction using sensor data. In this context the prediction step would estimate the next orientation based on angular velocity measurements from the gyroscope.
+\[
+\mathbf{q}_{k|k-1} = \mathbf{q}_{k-1} + \frac{\Delta t}{2} \mathbf{q}_{k-1} \otimes \mathbf{\omega}_k
+\]
+Where \( \mathbf{\omega} \) is the angular velocity vector measured by the gyroscope, \( \otimes \) denotes quaternion multiplication and \( \Delta t \) is the sampling interval. The state covariance matrix would also be updated in the standard manner.
+
+The correction step would then integrate accelerometer data to refine the orientation estimate. The accelerometer provides a measurement of the grabity vector in the sensor frame, which can be compared to the predicted gravity vector from the prediction step.
+\[
+\mathbf{z}_k = h(\mathbf{q}_k) = \mathbf{R}(\mathbf{q}_k) \mathbf{g}
+\]
+where \( \mathbf{R}(\mathbf{q}_k) \) is the rotation matrix corresponding to the predicted quaternion \( \mathbf{q}_k \), and \( \mathbf{g} \) is the gravity vector in the global frame.
+
+The innovation, or measurement residual, is computed as:
+\[
+\mathbf{y}_k = \mathbf{z}_k^{\text{meas}} - h(\mathbf{q}_{k|k-1})
+\]
+Finally the corrected state would be updated as 
+\[
+\mathbf{q}_{k|k} = \mathbf{q}_{k|k-1} + \mathbf{K}_k \mathbf{y}_k
+\]
+
+
+
+
+\textit{Evaluation}
+
+There are, however, challenges associated with using the EKF for real-time knee angle estimation. The first is the computational complexity. The EKF requires the computation of jacobians and matrix multiplications, which may introduce latency and therefore poor closed-loop performance. The second is sensor misalignment, for the EKF to work optimally the IMUs must be aligned, any misalignment would introduce systematic errors. Third is acceleration artifacts. The accelerometer data used to correct gyroscope drift is susceptible to artifacts caused by motions such as foot strikes, this could lead to significant deviations from the assumed gravitational reference vector, leading to erroneous corrections. Finally there is the sensitivity to initial conditions. The EKF requires accurate initialization of state vector and covariance matrix. Poor initialization can cause the filter to diverge. For these reasons and the complexity of its implementation along with time constraints of this project it was decided to not implement the extended kalman filter for knee angle estimation.
+
 
 %=================================================================
 %                           End Document
