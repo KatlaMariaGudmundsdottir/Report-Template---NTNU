@@ -2,17 +2,27 @@
 %=================================================================
 %                           Start Document
 %=================================================================
+\setstretch{1.6}
+
 \section{Discussion}
 \lhead{Discussion} % section header
 \subsection{Open Loop Sequence}
 
 \subsection{Knee Angle Extraction}
 
-In the future a different benchmarking technique should be used such as a wireless goniometer or the XSens which was used for validation of the open loop sequence but was regretfullu not available during the period in which the knee angle estimation method needed validation.
+The results of the knee angle stimulation demonstrate that the In-House IMU-based estimation method, which utilizes an adapted Madgwick filter, performs effectively in estimating knee joint angles during movement. However, slight drift in the estimation was observed, despite the theoretical robustness of the Madgwick algorithm to such errors. This drift could be attributed to several factors the first of which is that the way in which the algorithm is implemented assumes that the local coordinate axes of the IMUs are perfectly aligned with the anatomical knee joint axis. Any misalignment introduces errors in the computed knee angle, as the algoritm assumes that the relative orientation of the two IMUs reflects the hinge joint's motion accurately.
+
+\todo{knee orientation figure}
+
+This issue is further compounded by the possible shifting of the IMUs over time. This poses issues since the initial offset between the IMUs is assumed to be accurately calibrated and constant throghout the session. Additionally the Madgwick filter is not capable of accounting for changes in sensor alignment over time, leading to possible inaccuracies if the IMUs are not secured well enough.
+
+Another related challenge is the implicit assumption that the IMUs are do not experience significant external forces beyond those caused by the forward motion of the leg and gravity. In practice however, accelerometer readings can be affected by transient forces such as those that occurr during foot strikes. These forces may introduce noise into the orientation stimation process, specifically in the correction step of the Madgwick filter, where accelerometer data is used to align the estimated gravity vector with the measured gravity vector.
+
+Finally there is room for improvement with regards to the validation process itself. The Delsys derived knee angle, although likely more accurate than the In-House version since it has inbuilt sensor fusion algorithms for orientation estimation, is still using IMUs in order to estimate the angle. In order to benchmark in a better manner a goniometer sensor should be used instead or an even more robust sensor system. This could for example be the Xsens system used for validation of the open loop sequence which outputs knee angles without any additional processing necessary, but was regretfully not available during the period in which the knee angle estimation method was to be validated.. 
 
 \subsection{Closed-Loop}
 
-\todo{explain why using a PD}
+The results of the closed-loop gait control system provide an initial insight into the system's capabilities and limitations. 
 
 discuss that in further iterations it would be interesting to use a reference curve that was averaged acroos multiple subjects in order to make it more generalizable, one could even make specific demographic groups and speed groups such as female young adult or male middle aged, since there is some variation in gait dynamics between demographics, especially related to age and sex and weight
 

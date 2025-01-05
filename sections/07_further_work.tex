@@ -1,0 +1,20 @@
+\begin{document}
+%=================================================================
+%                           Start Document
+%=================================================================
+\section{Further work}
+\lhead{Further Work} % section header
+
+\subsection{Knee Angle Estimation}
+One of the challenges encountered when implementing a knee angle estimation algorithm is the need for alignment of the sensor frames to the relevant body segments. Although this is in effect implemented in the madgwick filter by ....
+
+Future work could explore the integration fo real-time alignment correction mechanisms, potentially leveraging additional data sources, such as magnetometers to monitor and adjust sensor alignment continuously.
+
+Further work could involve implementing motion segmentation algorithms to differentate between periods of high and low dynamic activity allowing the algorithm to weigh accelerometer corrections more effectively.
+
+not implemented here a possible further development would be to implement a sensor-to-segment alignment. Such algorithm can generally be categorized into manual alignment, static pose estimation, functional calibration, deep learning, or some combination of these approaches \cite{rhudy_knee_2024}. For further developing this project a simple static pose such as holding still for 5 to 10s in a specified standing pose could be utilized. The accelerometers would be utilized to detect the gravity vector and thus set the expected initial gravity vector in stead of simply assuming the gravity vector to be 
+
+%=================================================================
+%                           End Document
+%=================================================================
+\end{document}
