@@ -299,6 +299,11 @@ where \( q_w \) is the scalar component of \( \mathbf{q}_{\text{relative}} \).
 \textit{Evaluation}
 
 The main advantages of the Madgwick filter are that it is computationally efficient, especially designed for low cost, noisy IMUs, does not introduce potentially problematic delays, it's theoretically robust due to the correction step, the quaternion-based representation avoids singularities associated with euler angles. However there are some potential limitations. It might be sensitive to accelerometer noise such as during foot strikes. With this implementation there is also an implicit assumption that the local coordinate axes align exactly with the knee joint axis, additionally there is the assumptions that the IMUs themselves are algined. However all sensor fusion algorithm found during this project would also have required the same assumptions. Therefore because of the applicability of the algorithm, theoretical robustness and ease of implementation the Madgwick filter was selcted and adapted in order to estimate the knee angle.
+\newline
+
+\textit{Offset}
+Since the IMUs are mounted on the thigh and shank the initial angle between their two orientations is not zero. Therefore the IMU GUI includes an offset section where the user can put in the amount that the measured degree should be offset by so that in full extension the computed knee angle is zero.
+
 
 \subsection{Phase detection}
 
