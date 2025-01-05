@@ -30,6 +30,8 @@
 %=================================================================
 %                           Start Document
 %=================================================================
+\setstretch{1.6}
+
 \section{Results}
 \lhead{Results} % section header
 
@@ -59,13 +61,84 @@ The results show that the adapted Madgwick filter does a good job of estimating 
 
 
 \subsection{Closed-Loop}
+The closed loop implementation was tested on a single healthy subject at two different speeds while walking on the treadmill. The subject was instructed to try to put little weight on the leg that to be stimulated and try to relax the muscles as much as possible during the stimulation sequence. The subjects leg length was measured and gait cycle duration was set according to the methodology laid out in the methods section on gait cycle duration. After finding the correct electrode placements, the motor threshold and maximum tolerable intensity, the feedforward value was set to a value between those values and the proportional gain and integral gain were tuned.  The results along with the stimulation curves for the four muscle stimulation cites are visible in the figures below.
 
-\begin{figure}
+\subsubsection{Slower Speed}
+During the slower speed stimulation the following parameters were tuned and used on the subject:
+
+\begin{table}[h!]
+\centering
+\caption{Closed Loop Parameters for 0.8km/h}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Muscle} & \textbf{Feedforward Current (mA)} & \textbf{Stimulation Limit (mA)} & \textbf{$K_p$} & \textbf{$K_i$} \\ \hline
+Tibialis Anterior  & 35 & 45 & 0.1 & 0.05 \\ \hline
+Vastus Medialis    & 25 & 35 & 0.3 & 0.05 \\ \hline
+Gastrocnemius      & 35 & 45 & 0.1 & 0.05 \\ \hline
+Hamstring          & 35 & 50 & 0.4 & 0.05 \\ \hline
+\end{tabular}
+\label{tab:closed_loop_9}
+\end{table}
+
+\begin{figure} [H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/CL12ref.png}
-    \caption{Closed loop knee angles}
-    \label{fig:el12ref}
+    \includegraphics[width=0.95\linewidth]{images/CL9refpng.png}
+    \caption{Closed loop knee angles for 0.8km/h}
+    \label{fig:cl9ref}
 \end{figure}
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/CL9stimpng.png}
+    \caption{Closed loop stimulation for 0.8km/h}
+    \label{fig:cl9stim}
+\end{figure}
+
+Based on the reults seen in figure \ref{fig:cl9ref} and \ref{fig:cl9stim}, the closed loop control system demonstartes a resonable ability to follow the major peaks and valleys of the reference knee angle trajectory at the slower speed of 0.8 km/h. The measured knee angle aligns well with the timing and amplitude of the primary peaks. 
+
+However, the system struggles to replicate the smaller peaks and subtler variations in the reference trajectory. This discrepancy could can be attributed to limitations in the PI controls responsiveness to small variations in reference knee angle and delay in muscle response. This issue might however be possible to mitigate by further tuning of the gains. As can be observed in figure \ref{fig:cl9stim} the variation in stimulation amplitude is not very large, indicating that there is room for increasing the gains and thus the variation in intensity.  
+
+Notably, there is minimal delay observed between the initiation of the initial spike in the reference signal and the corresponding response in the measured knee angle. This highlights the control systems rapid reaction time, which is curcial for maintaining synchrnoization with the reference gait pattern.
+
+\todo{talk more about the stimulation and compare with open loop stimulation}
+
+\subsubsection{Faster Speed}
+During the faster speed (1.5km/h) the following parameters were tuned and used on the subject:
+
+\begin{table}[h!]
+\centering
+\caption{Closed Loop Parameters for 1.5km/h}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Muscle}  & \textbf{Feedforward Current (mA)} & \textbf{Stimulation Limit (mA)} & \textbf{$K_p$} & \textbf{$K_i$} \\ \hline
+Tibialis Anterior & 35 & 45 & 0.2 & 0.05 \\ \hline
+Vastus Medialis   & 20 & 35 & 0.4 & 0.05 \\ \hline
+Gastrocnemius     & 35 & 45 & 0.2 & 0.05 \\ \hline
+Hamstring          & 35 & 50 & 0.5 & 0.05 \\ \hline
+\end{tabular}
+\label{tab:closed_loop_12}
+\end{table}
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/CL12ref.png}
+    \caption{Closed loop knee angles for 1.5km/h}
+    \label{fig:cl12ref}
+\end{figure}
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/CL12stim.png}
+    \caption{Closed loop stimulation}
+    \label{fig:cl12stim}
+\end{figure}
+
+At a faster speed of 1.5km/h the results (figure \ref{fig:cl12ref} demonstrate that the closed-loop control system is capable of following the general trajectory of the referance knee angle values. However there is a marked delay between the reference curve and the measured curve, which was not present to the same degree at a slower speed.
+
+Another interesting observation is that the systems seems to more accurately capture the smaller peaks in the trajectory compared to the slower speed. This is likely due to the increased gains in the control system leading to larger variations in the stimulation amplitude as can be seen in figure \ref{fig:cl12stim}.
+
+Compared to the slower speed it is also clear the sampling frequency of the IMU measurements might be becoming an issue at this speed. This is particularly evident during periods of faster transitions, in which the measured signal becomes more jagged and noisy, possibly leading to suboptimal stimulation intensities being applied.
+
 
 
 %=================================================================

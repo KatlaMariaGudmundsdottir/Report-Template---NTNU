@@ -409,6 +409,13 @@ From which the gait cycle duration is extracted and inserted into the program to
 To dynamically adjust the current amplitude based on the error between the desired and actual knee angle, a proportional-integral (PI) controller was implemented and tuned for each muscle independently. 
 \newline
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{cont}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
 \textit{Controller choice}
 
 The PI controller was chosen for its ability to address the system's specific needs.  Even though the reference angle changes over time a proportional-only controller may not adequately address persistent and steady-state errors as it only responds to the instantaneous error. Adding the integral term which accumulates error over time, effectively compensates for any consistent offset (e.g. under- or over-stimulation) that the proportional term cannot eliminate. 
@@ -417,7 +424,7 @@ The PI controller was chosen for its ability to address the system's specific ne
 
 In a FES system, delays in muscle activation and mechnical response can cause the actual knee angle to lag behind the desired reference. By including an integral term the controller accounts for these delays indirectly: if the knee angle lags due to delayed muscle response, the accumulateed error promts the system to apply a sustained correction to minimize the offset over time.
 
-The justification for not including a derivative term is that even though the derivative term would in theory enhance the responsiveness to rapid changes it would also implify the noise in the system. The IMU measurements and subsequent knee angle calculation is noisy and including a derivative term could quickly destabilize the control loop.
+The justification for not including a derivative term is that even though the derivative term would in theory enhance the responsiveness to rapid changes it would also simplify the noise in the system. The IMU measurements and subsequent knee angle calculation is noisy and including a derivative term could quickly destabilize the control loop.
 \newline 
 
 \textit{Implemetation for FES}
@@ -438,6 +445,8 @@ The PI controller also incorporates a phase-specific adaptation. This is because
 
 \subsubsection{Feedforward Current}
 A feedforward current is implemented for each muscle individually to provide a baseline stimulation amplitude, ensuring sufficient activation to induce movement. It is set around the midpoint between the motor threshold and the maximum tolerable intesity found for each muscle during setup. 
+
+\todo{GUI of the Closed loop}
 
 Including a feedforward current is particularly beneficial in FES systems because it provides a consisten baseline for muscle activation reducing reliance on reactibe feedback adjustments and ensuring smotther, more predictable responses during the giat cycle. It also helps address delays in muscle activation and mechenical response by esnuring timely stimulation even before feedback corrections take effect. Additionally, the feedforward current reduces the workload on the feeback controller by offloading the need for large corrective actions requiring large gain values, allowing the controller to focus on fine-tuning adjustments.
 

@@ -81,6 +81,9 @@ Finally the corrected state would be updated as
 
 There are, however, challenges associated with using the EKF for real-time knee angle estimation. The first is the computational complexity. The EKF requires the computation of jacobians and matrix multiplications, which may introduce latency and therefore poor closed-loop performance. The second is sensor misalignment, for the EKF to work optimally the IMUs must be aligned, any misalignment would introduce systematic errors. Third is acceleration artifacts. The accelerometer data used to correct gyroscope drift is susceptible to artifacts caused by motions such as foot strikes, this could lead to significant deviations from the assumed gravitational reference vector, leading to erroneous corrections. Finally there is the sensitivity to initial conditions. The EKF requires accurate initialization of state vector and covariance matrix. Poor initialization can cause the filter to diverge. For these reasons and the complexity of its implementation along with time constraints of this project it was decided to not implement the extended kalman filter for knee angle estimation.
 
+\subsection{parameters for closed loop stimulation}
+
+\todo{Insert parameters for closed loop stimulation}
 
 %=================================================================
 %                           End Document
