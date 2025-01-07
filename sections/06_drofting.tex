@@ -7,6 +7,25 @@
 \section{Discussion}
 \lhead{Discussion} % section header
 \subsection{Open Loop Sequence}
+The results of the open loop FES highlighted the potential of sequence to produce consistent gait patterns, but there are several points that warrant discussion.
+\newline
+
+\textit{Testing in Healthy individuals}
+
+One significant challenge is the inherent difficulty of testing FES on healthy subjects. Healthy individuals naturally recruit their muscles during walking, even when instructed to minimize voluntary muscle activity and rely on stimulation. This introduces variability in the response to FES, as the subjects neuromuscular system interacts with the stimulation in ways that differ from the inteded clinical scenarios. These interaction can obscure the system's true efficacy.
+
+There are also other possible consequences. Firstly, patients with neurological impairments, there might be less of a falling out of sync issue, which observed in healthy individual in this study. The lack of competing coluntary muscle activity could make FES-induced movements more consistend and predictable. Secondly, there is evidence suggesting that patients may perceive FES differently from healthy individuals. While healthy subject often report discomfort during stimulation, patients with neurological conditions may experience reduced discomfort, potentially making it easier to achieve functional movements. This could make the setup simpler and more comfortable and effective in patient populations. \todo{source}
+
+
+\textit{Lack of Weight Support System}
+Weight support could have created a more controlled environment for stimulation. Particularly in healthy individuals the it would have helped to minimize the effect of involuntary muscle contractions that all healthy individuals will have when placed on a treadmill. This would have lended more credibility to the results, as it is not certain how much of the movement during the gait is due only to the stimulation or if the subjects are inadverdently activating their muscles during the study.
+\newline 
+
+\textit{Alignment with Natural Synergies}
+
+The gait sequence used in this study, while not explicitly modeled on natural synergies closely resembles the muscle synergies during normal gait. The primary deviation is in the absence of stimualation to the rectus femoris. In natural synergies, the rectus femoris plays a key role in both hip flection and knee extension \todo{source}. However, 
+
+The decision to exclude rectus femoris stimulation was guided by the goal of creating a simple and comfortable sequence that is generalizable, not too complex to setup and applicable for clinical use. However, if the objective were to mimic the natural synergies, a low-current stimulation of the rectus femoris could be considered. Low current, since when stimulated it acts visibly as a knee extensor. This raises an important question about the trade offs between simplicity and fidelity to natural synergies, which should be be considered in the context of clinical goals.
 
 \subsection{Knee Angle Extraction}
 
@@ -27,9 +46,7 @@ Finally there is room for improvement with regards to the validation process its
 
 \subsection{Closed-Loop}
 
-The results of the closed-loop gait control system provide an initial insight into the system's capabilities and limitations. 
-
-One significant challenge is the inherent difficulty of testing FES on healthy subjects. Healthy individuals naturally recruit their muscles during walking, even when instructed to minimize coluntary muscle activity and rely on stimulation. This introudces variability in the response to FES, as the subjects neuromuscular system interacts with the stimulation in ways that differ from the inteded clinical scenarios. These interaction can obscure the system's true efficacy.
+The results of the closed-loop gait control system provide an initial insight into the system's capabilities and limitations. The first issue is that of the difficulty of testing FES on healthy subjects, discussed earlier for the Open-Loop stimulation sequence.
 
 The limited subject pool is another issue. Testing on a single subject restricts the generalizability of the results and does not account for individual variability. Differences in muscle composition, skin impedance and motor thresholds could significantly affect the control system's performance. A larger cohort of subjects would provide a more comprehensice understanding of the system's robustness.
 

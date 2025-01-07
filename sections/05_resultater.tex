@@ -36,7 +36,7 @@
 \lhead{Results} % section header
 
 \subsection{Open Loop Stimulation Sequence}
-The four muscle open loop stimulation sequence laid out in the methods section on open loop stimulation, was tested on three healthy subjects between the ages of 22 and 25, two female and one male. During the setup phase the optimal placements for the electrodes for each individual subject were found along with the motor threshold and the maximum tolerable intensity. The stimulation intensity was set as the value in which the functional movement associated with that muscle was achieved and the movement resembled the reference videos mentioned in the methods section as closely as possible.
+The four muscle open loop stimulation sequence laid out in the methods section on open loop stimulation, was tested on three healthy subjects between the ages of 22 and 25, two female and one male. This was done before moving further with closed loop development, to ensure that the stimuation sequence was generalizable to across individuals. During the setup phase the optimal placements for the electrodes for each individual subject were found along with the motor threshold and the maximum tolerable intensity. The stimulation intensity was set as the value in which the functional movement associated with that muscle was achieved and the movement resembled the reference videos mentioned in the methods section as closely as possible.
 
 The subjects were then fitted with the Xsens Awida  motion capture system IMUs. The Xsens Awinda is a wireless, wearable system that uses IMUs specifically designed to capture human movement without the need for cameras or external markers \cite{noauthor_mvn_nodate}. It is often used for validation in literate since it provides accurate, portable motion tracking. The system was calibrated before subjects were instructed to go on the treadmill. 
 
@@ -48,31 +48,32 @@ To analyze the results of the stimulation experiment, data from the MVNX files p
 
 To align and normalize the gait cycles, the peaks in the knee flexion data were identified using the \texttt{scipy.signal} module. Consecutive peaks were used to segment the flexion data into individual gait cycles. To ensure meaningful averaging across cycles, the segmented gait cycles were normalized in length. Each cycle was interpolated to 100 equidistant points, corresponding to a percentage of the gait cycle. Once normalized the gait cycles were averaged point by point to compute the mean knee angle and standard deviation. The data was then shifted so that the peak would be centered at the 75\% mark. The standard deviation values were used to create the upper an lower bounds of the colored regions around the mean which is plotted as a continuous curve. 
 
-
-
-
-
-
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.95\linewidth]{images/alexisoutput1.png}
+    \includegraphics[width=0.99\linewidth]{images/alexisoutput1.png}
     \caption{Caption}
-    \label{fig:enter-label}
+    \label{fig:alexisout}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.95\linewidth]{images/katlaoutput1.png}
+    \includegraphics[width=0.99\linewidth]{images/katlaoutput1.png}
     \caption{Caption}
-    \label{fig:enter-label}
+    \label{fig:katlaout}
 \end{figure}
 
 \begin{figure} [h]
     \centering
-    \includegraphics[width=0.95\linewidth]{images/leonioutput1.png}
+    \includegraphics[width=0.99\linewidth]{images/leonioutput1.png}
     \caption{Caption}
-    \label{fig:enter-label}
+    \label{fig:leoniout}
 \end{figure}
+
+The results from the three subjects can be seen in figure \ref{fig:alexisout}, \ref{fig:katlaout} and \ref{fig:leoniout}. A observation across all subjects is that the shapes of the mean knee angle curves are remarkably similar between the stimulated and non-stimulated conditions. This is despite natural differences in the gait patterns of the individuals. This similarity indicates that the general kinematic pattern is preserved under electrical stimulation. However, the standard deviation around is noticeably larger in the stimulated condition for all subject. Indicating increased variability in the step during stimulated walking.
+
+One observed challenge during open-loop stimualtion was that, in some instances, subjects took disproportionately small or large steps with the contralateral (non-stimulated) leg. This disrupted the gait rhythm and caused the walking pattern to fall out of sync with the stimulation pattern. Leading to unstability until the subjects gait was again syncronized with the stimulation. This issue was particularly evident in subject 3 (figure \ref{fig:leoniout}), which resulted in the especially large standard deviation. This issue reflects the lack of adaptability when using an open-loop stimulation system, which does not account for real-time changes in the subject's gait rhythm or step length. 
+
+However, overall, the results show that the open loop stimulation sequence is generalizable and works across individuals, meaning that the project could move on to further develop the closed-loop which bases its stimulation sequence on this result.
 
 
 \subsection{Knee Angle Estimation}
@@ -180,7 +181,7 @@ At a faster speed of 1.5km/h the results (figure \ref{fig:cl12ref} demonstrate t
 
 Another interesting observation is that the systems seems to more accurately capture the smaller peaks in the trajectory compared to the slower speed. This is likely due to the increased gains in the control system leading to larger variations in the stimulation amplitude as can be seen in figure \ref{fig:cl12stim}.
 
-Compared to the slower speed it is also clear the sampling frequency of the IMU measurements might be becoming an issue at this speed. This is particularly evident during periods of faster transitions, in which the measured signal becomes more jagged and noisy, possibly leading to suboptimal stimulation intensities being applied.
+Compared to the slower speed it is also clear the sampling frequency of the IMU measurements might be becoming an issue at this speed. This is particularly evident during periods of faster transitions, in which the measured signal becomes more jagged and noisy, possibly leading to suboptimal stimulation intensities being applied. 
 
 
 
