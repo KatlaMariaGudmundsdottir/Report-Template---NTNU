@@ -84,11 +84,18 @@ The pulse duration (pulse width) is the timespan of the stimulation pulse. Highe
 
 The amplitude of the stimulation determines which muscles are contracted and the strength of the contraction \cite{marquez-chin_functional_2020}. Larger amplitudes recruit a larger proportion of the muscle fibers, including those located deeper. 
 
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/setupgui.png}
+    \caption{Graphical User Interface for setting up and finding stimulation thresholds}
+    \label{fig:setupgui}
+\end{figure}
+
 There are several clinically important values for the amplitude that can be identified. The first is the motor threshold, which is the minimum intensity  that results in a visible muscle contraction, but not necessarily a movement \cite{marquez-chin_functional_2020}. The second is the Maximum tolerable intensity, which is the maximum amplitude that the person can sustain without pain. Finally there is the operational stimulation amplitude, which is the amplitude that produces the intended functional movement needed for the gait cycle. 
 
-These thresholds are highly variable and dependent on both muscle and subject, therefore they are determined here experimentally by slowly ramping up the amplitude for one muscle at a time. Noting when a motor threshold is reached, when the maximum tolerable intensity is reached and based on these values and feedback from the patient a operational stimulation amplitude is set somewhere between the thresholds. This is expanded upon in the sections relating to the open loop and closed loop implementations.
+These thresholds are highly variable and dependent on both muscle and subject, therefore they are determined here experimentally by slowly ramping up the amplitude for one muscle at a time using the graphical interface in figure \ref{fig:setupgui}. Noting when a motor threshold is reached, when the maximum tolerable intensity is reached and based on these values and feedback from the patient a operational stimulation amplitude is set somewhere between the thresholds. 
 
-\todo
+
 
 \subsubsection{Electrode configuration}
 There are two main configuration for electrical activation of neuromuscular tissue. There is bipolar stimulation in which each stimulation cite has an active electrode placed near the peripheral nerve and a reference electrode close by. The other configuration is monopolar where the return electrode is placed in a remote area near less excitable tissue \cite{peckham_functional_2005}. 
@@ -105,7 +112,7 @@ Every stimulated muscle thereby required two electrodes, one active electrode an
 \subsubsection{Electrode placement}
 The placement of electrodes is an critical factor for achieving effective stimulation. It determines the quality of muscle activation the specificity and the comfort for the user. However, the optimal placements for each muscle is highly subject-dependent which makes the process of finding the placements challenging and time consuming.
 
-To establish some form of systematic approach the optimal placements were first found in myself. This involved iteratively adjusting the placement of both the active and reference electrode positions, observing the muscle responses at different amplitudes and the discomfort level until a functional movement was achieved under the pain threshold (maximum tolerable intensity). Physiologically, optimal electrode placement aligns with the motor points of the targeted muscles \todo{source}. Motor points are regions where the motor nerve enters the muscle, resulting in the lowest threshold for activation thus minimizing discomfort and fatigue \todo{source}. To find the optimal placements for each muscle several sources were consulted with the most used source being an atlas of the muscle motor points by A. Botter \cite{botter_atlas_2011}. 
+To establish some form of systematic approach the optimal placements were first found in myself. This involved iteratively adjusting the placement of both the active and reference electrode positions, observing the muscle responses at different amplitudes and the discomfort level until a functional movement was achieved under the pain threshold (maximum tolerable intensity). Physiologically, optimal electrode placement aligns with the motor points of the targeted muscles \cite{gobbo_muscle_2014}. Motor points are regions where the motor nerve enters the muscle, resulting in the lowest threshold for activation thus minimizing discomfort and fatigue \cite{gobbo_muscle_2014}. To find the optimal placements for each muscle several sources were consulted with the most used source being an atlas of the muscle motor points by A. Botter \cite{botter_atlas_2011}. 
 
 \begin{figure}
     \centering
@@ -118,14 +125,19 @@ To document the process and provide a reference for future users a series of vid
 
 \subsection{Open Loop Stimulation Sequence}
 \lhead{Implementation - Open Loop Stimulation Sequence}
-The open loop stimulation sequence specifies which muscles should be stimulated, the duration oftheir activation adn the delays between activations. The sequence aims to replicate a single step (gait cycle) for one leg using FES. The final goal is to produce a step that feels and looks natural and is comfortable for the subject while being general enough to work for a variety of subjects.
+The open loop stimulation sequence specifies which muscles should be stimulated, the duration of their activation and the delays between activations. The sequence aims to replicate a single step (gait cycle) for one leg using FES. The final goal is to produce a step that feels and looks natural and is comfortable for the subject while being general enough to work for a variety of subjects.
 
 \subsubsection{Testing the Existing Sequence}
-Initially, it was beleived that a working open loop sequence had already been established by a previous student. However upon testing the sequence on two different subject it became clear that the sequence ineffective and did not produce a step. The muscle activation was observed to feel unnatural and uncomfortable and ultimatley failed to pelicate a smooth coordinated movement. It therefore became necessary to dermine whether these issues stemned from errors in the implementation or from issues with the sequence itself.
+Initially, it was believed that a working open loop sequence had already been established by a previous student. However upon testing the sequence on two different subject it became clear that the sequence ineffective and did not produce a step. The muscle activation was observed to feel unnatural and uncomfortable and ultimately failed to replicate a smooth coordinated movement. It therefore became necessary to determine whether these issues stemmed from errors in the implementation or from issues with the sequence itself.
 
-\todo{figures}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
 
-This initial sequence was based on electromyography (EMG) measurements of muscle activation during gait in two healthy subject. Therefore to evalueate the accuracy of the sequence the EMG measurements from the two subjects were compaired against a comprehensice, open-source dataset of EMG activity during gait \cite{camargo_comprehensive_2021}. The discrepancies between the two became immediately apparent. In gait phases where the dataset indicated that certain muscles-such as the vastus medialis, hamstrings,and gluteus maximus-should be largely inactive the EMG measurement from the two subjects showed significant activation. There are several likely causes for these inaccuracies uncluding noise, motion artifacts or the EMG sensors picking up activity from muscles. Since the stimulation sequence was based directly on this flawed data several muscles were being stimulated during periods where they should be entierly inactive. This is what lead to the failure of the sequence in reproducing a natural and functional gait cycle. Having confirmed that the issue lay in the sequence itself, rather than its implementation, the focus was shifted to designing an entirely new stimulation sequence.
+This initial sequence was based on electromyography (EMG) measurements of muscle activation during gait in two healthy subject. Therefore to evalueate the accuracy of the sequence the EMG measurements from the two subjects were compared against a comprehensive, open-source dataset of EMG activity during gait \cite{camargo_comprehensive_2021}. The discrepancies between the two became immediately apparent. In gait phases where the dataset indicated that certain muscles-such as the vastus medialis, hamstrings,and gluteus maximus should be largely inactive the EMG measurement from the two subjects showed significant activation. There are several likely causes for these inaccuracies including noise, motion artifacts or the EMG sensors picking up activity from muscles. Since the stimulation sequence was based directly on this flawed data, several muscles were being stimulated during periods where they should be entirely inactive. This is what lead to the failure of the sequence in reproducing a natural and functional gait cycle. Having confirmed that the issue lay in the sequence itself, rather than its implementation, the focus was shifted to designing an entirely new stimulation sequence.
 
 \subsubsection{Finding a new sequence}
 
