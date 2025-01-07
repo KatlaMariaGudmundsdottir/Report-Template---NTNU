@@ -36,6 +36,7 @@
 \lhead{Results} % section header
 
 \subsection{Open Loop Stimulation Sequence}
+The four muscle open loop stimulation sequence was tested on three healthy subjects between the ages of 22 and 25, two fremale and one male. 
 
 \subsection{Knee Angle Estimation}
 Accurate knee angle estimation is critical for the closed loop FES application. Therefore the Madgwick knee angle stimation technique was validated by comparing the IN-House IMU based knee angle estimation with the DELSYS IMU base knee angle estimate as a benchmark. Delsys IMUs provide high-quality orientation data by leveraging advanced sensor fusion algorithms, designed specifically for biomechanical and movement studies \todo{source add more detail}. 
@@ -56,7 +57,9 @@ The validation experiment consisted of mounting the Delsys IMUs and In-House IMU
     \label{fig:t11}
 \end{figure}
 
-The results show that the adapted Madgwick filter does a good job of estimating the knee angle. However we see some slight drift, even though the Madgwick filter should in theory be robust to drift. It is however worth noting here that there are some clear inaccuracies in the Delys derived knee angle as well. Specifically we observe that there is a valley in the calculated knee angle followed by a flattening out of the curve when the knee is extended, this does not reflect the actual movement that the subject performs. The ideal performance of the IN-House developed knee angle estimation is therefore not necessarily an exact replication of the Delsys curve. The In-House algorithm does not seem to have this same artifact. 
+The results show that the adapted Madgwick filter does a good job of estimating the knee angle. However we see some slight drift, even though the Madgwick filter should in theory be robust to drift. It is however worth noting here that there are some clear inaccuracies in the Delys derived knee angle as well. Specifically we observe that there is a valley in the calculated knee angle followed by a flattening out of the curve when the knee is extended, this does not reflect the actual movement that the subject performs. The ideal performance of the IN-House developed knee angle estimation is therefore not necessarily an exact replication of the Delsys curve. The In-House algorithm does not seem to have this same artifact.
+
+A thorough delay logging was also implemented in order to validate that the filtering and calculations did not introduce too large delays that would introduce issues in the closed loop control. \todo{insert delay results}
 
 
 
@@ -132,6 +135,9 @@ Hamstring          & 35 & 50 & 0.5 & 0.05 \\ \hline
     \caption{Closed loop stimulation}
     \label{fig:cl12stim}
 \end{figure}
+
+\todo{Take a look at raw IMU data}
+\todo{Take a look at Open loop, compare stim}
 
 At a faster speed of 1.5km/h the results (figure \ref{fig:cl12ref} demonstrate that the closed-loop control system is capable of following the general trajectory of the referance knee angle values. However there is a marked delay between the reference curve and the measured curve, which was not present to the same degree at a slower speed.
 

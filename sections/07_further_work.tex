@@ -5,14 +5,25 @@
 \section{Further work}
 \lhead{Further Work} % section header
 
+\setstretch{1.6}
+
 \subsection{Knee Angle Estimation}
-One of the challenges encountered when implementing a knee angle estimation algorithm is the need for alignment of the sensor frames to the relevant body segments. Although this is in effect implemented in the madgwick filter by ....
+One of the challenges encountered when implementing a knee angle estimation algorithm is the need for alignment of the sensor frames to the relevant body segments. Although this is in effect implemented in the madgwick filter by .... 
+
 
 Future work could explore the integration fo real-time alignment correction mechanisms, potentially leveraging additional data sources, such as magnetometers to monitor and adjust sensor alignment continuously.
 
 Further work could involve implementing motion segmentation algorithms to differentate between periods of high and low dynamic activity allowing the algorithm to weigh accelerometer corrections more effectively.
 
-not implemented here a possible further development would be to implement a sensor-to-segment alignment. Such algorithm can generally be categorized into manual alignment, static pose estimation, functional calibration, deep learning, or some combination of these approaches \cite{rhudy_knee_2024}. For further developing this project a simple static pose such as holding still for 5 to 10s in a specified standing pose could be utilized. The accelerometers would be utilized to detect the gravity vector and thus set the expected initial gravity vector in stead of simply assuming the gravity vector to be 
+not implemented here a possible further development would be to implement a sensor-to-segment alignment. Such algorithm can generally be categorized into manual alignment, static pose estimation, functional calibration, deep learning, or some combination of these approaches \cite{rhudy_knee_2024}. For further developing this project a simple static pose such as holding still for 5 to 10s in a specified standing pose could be utilized. The accelerometers would be utilized to detect the gravity vector and thus 
+
+
+\subsection{Closed-Loop}
+Future studies would benefit from adding a weight support system to minimize voluntary reqruitment when testing in healthy individuals. However testing in a in indiciduals with neurological impairments would clearly be the best case scenario. 
+
+The limited subject pool in this project is another issue that should be addressed in future work.
+
+discuss that in further iterations it would be interesting to use a reference curve that was averaged acroos multiple subjects in order to make it more generalizable, one could even make specific demographic groups and speed groups such as female young adult or male middle aged, since there is some variation in gait dynamics between demographics, especially related to age and sex and weight
 
 %=================================================================
 %                           End Document

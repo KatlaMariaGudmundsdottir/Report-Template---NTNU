@@ -12,7 +12,12 @@
 
 The results of the knee angle stimulation demonstrate that the In-House IMU-based estimation method, which utilizes an adapted Madgwick filter, performs effectively in estimating knee joint angles during movement. However, slight drift in the estimation was observed, despite the theoretical robustness of the Madgwick algorithm to such errors. This drift could be attributed to several factors the first of which is that the way in which the algorithm is implemented assumes that the local coordinate axes of the IMUs are perfectly aligned with the anatomical knee joint axis. Any misalignment introduces errors in the computed knee angle, as the algoritm assumes that the relative orientation of the two IMUs reflects the hinge joint's motion accurately.
 
-\todo{knee orientation figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/kneeOrientation.png}
+    \caption{\textbf{a)} Local sensor coordinate axes are not aligned with the physiological axes an dplanes by which the joing anvle, \(\alpha\), is defined \textbf{b)} The coordinates of the joint axis direction (green arrows) and the joint position (blue arrows) in the local coordinate system of the sensors \cite{seel_imu-based_2014}}
+    \label{fig:enter-label}
+\end{figure}
 
 This issue is further compounded by the possible shifting of the IMUs over time. This poses issues since the initial offset between the IMUs is assumed to be accurately calibrated and constant throghout the session. Additionally the Madgwick filter is not capable of accounting for changes in sensor alignment over time, leading to possible inaccuracies if the IMUs are not secured well enough.
 
@@ -24,7 +29,11 @@ Finally there is room for improvement with regards to the validation process its
 
 The results of the closed-loop gait control system provide an initial insight into the system's capabilities and limitations. 
 
-discuss that in further iterations it would be interesting to use a reference curve that was averaged acroos multiple subjects in order to make it more generalizable, one could even make specific demographic groups and speed groups such as female young adult or male middle aged, since there is some variation in gait dynamics between demographics, especially related to age and sex and weight
+One significant challenge is the inherent difficulty of testing FES on healthy subjects. Healthy individuals naturally recruit their muscles during walking, even when instructed to minimize coluntary muscle activity and rely on stimulation. This introudces variability in the response to FES, as the subjects neuromuscular system interacts with the stimulation in ways that differ from the inteded clinical scenarios. These interaction can obscure the system's true efficacy.
+
+The limited subject pool is another issue. Testing on a single subject restricts the generalizability of the results and does not account for individual variability. Differences in muscle composition, skin impedance and motor thresholds could significantly affect the control system's performance. A larger cohort of subjects would provide a more comprehensice understanding of the system's robustness.
+
+Finally the delay and jagged IMU signal at faster speeds might indicate the limits of the system's control bandwidth at higher walking speeds. If the IMU signals do not manage to have a high enough accuracy to accurately measure the knee angle the closed loop control will introduce errors into the system that will make it in effect worse than the open loop implementation. The madgwick filter has been proved to introduce very minimal delays, so this might indivate that the IMU sampling frequency might be insufficient to capture rapid movements accurately. 
 
 
 %=================================================================
