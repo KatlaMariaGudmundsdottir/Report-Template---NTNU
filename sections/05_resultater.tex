@@ -36,7 +36,44 @@
 \lhead{Results} % section header
 
 \subsection{Open Loop Stimulation Sequence}
-The four muscle open loop stimulation sequence was tested on three healthy subjects between the ages of 22 and 25, two fremale and one male. 
+The four muscle open loop stimulation sequence laid out in the methods section on open loop stimulation, was tested on three healthy subjects between the ages of 22 and 25, two female and one male. During the setup phase the optimal placements for the electrodes for each individual subject were found along with the motor threshold and the maximum tolerable intensity. The stimulation intensity was set as the value in which the functional movement associated with that muscle was achieved and the movement resembled the reference videos mentioned in the methods section as closely as possible.
+
+The subjects were then fitted with the Xsens Awida  motion capture system IMUs. The Xsens Awinda is a wireless, wearable system that uses IMUs specifically designed to capture human movement without the need for cameras or external markers \cite{noauthor_mvn_nodate}. It is often used for validation in literate since it provides accurate, portable motion tracking. The system was calibrated before subjects were instructed to go on the treadmill. 
+
+\todo{XSens figure}
+
+The treadmill was set to 1.5km/h and subjects were instructed to relax as much as possible the muscles in the leg which would be stimulated. The stimulation ran for 3 minutes and thereafter a baseline measurement was done in which the subjects muscles were not stimulated and they simply walked on the treadmill for three minutes. 
+
+To analyze the results of the stimulation experiment, data from the MVNX files produced by the Xsens system were processed in Python to extract and compare the knee angles across gait cycles with and without stimulation. The Xsens system includes inbuilt sensor fusion capable of outputting the knee angle this was then loaded for processing by using the \texttt{load\_mvnx} library. 
+
+To align and normalize the gait cycles, the peaks in the knee flexion data were identified using the \texttt{scipy.signal} module. Consecutive peaks were used to segment the flexion data into individual gait cycles. To ensure meaningful averaging across cycles, the segmented gait cycles were normalized in length. Each cycle was interpolated to 100 equidistant points, corresponding to a percentage of the gait cycle. Once normalized the gait cycles were averaged point by point to compute the mean knee angle and standard deviation. The data was then shifted so that the peak would be centered at the 75\% mark. The standard deviation values were used to create the upper an lower bounds of the colored regions around the mean which is plotted as a continuous curve. 
+
+
+
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{images/alexisoutput1.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{images/katlaoutput1.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{images/leonioutput1.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
 
 \subsection{Knee Angle Estimation}
 Accurate knee angle estimation is critical for the closed loop FES application. Therefore the Madgwick knee angle stimation technique was validated by comparing the IN-House IMU based knee angle estimation with the DELSYS IMU base knee angle estimate as a benchmark. Delsys IMUs provide high-quality orientation data by leveraging advanced sensor fusion algorithms, designed specifically for biomechanical and movement studies \todo{source add more detail}. 
