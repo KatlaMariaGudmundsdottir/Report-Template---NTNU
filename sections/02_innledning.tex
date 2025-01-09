@@ -7,20 +7,38 @@
 
 \setstretch{1.6}
 
-\subsection{Project background}
+\subsection{Motivation}
+
+Several conditions may cause lower limb motor disorders including stroke, cerebral palsy and muscular dystrophy \cite{hayami_development_2022}. There are around 101 million people living with the effects of stroke \cite{noauthor_key_nodate}, nine of ten of which experience gait disorders \cite{schaechter_motor_2004}. Hemiparesis, which is a condition characterized by weakness or partial paralysis on one side of the body effect 65\% of stroke victims \cite{wist_muscle_2016} and is a primary contributor to gait disorders. Losing the ability to move voluntarily can have decastating consequences for both the independence and quality of life of the person affected \cite{marquez-chin_functional_2020}. There is therefore a large need for effective rehabilitation techniques for these patients. This project implements a system aimed at improving rehabilitation specifically for stroke patients struggling with hemiparetic gait disorders, however the control systems are applicable to the treatment of neurological motor disorders in general.
+
+Today there are several options for gait rehabilitation, the conventional treatment is physiotherapy, however Functional Electrial Stimulation (FES) has become more popular with time \cite{muller_adaptive_2020}. When electrical stimulation is used along with functional training to facilitate movement performance (such as relearning to walk), it is referred to as FES training \cite{hayami_development_2022}. It has been demonstrated that FES can improve blood circulation, range of motion, muscle strength and muscle spasticity \cite{luo_review_2020}. FES stimuation of muscles and nerves can also help restore communication pathways between brain and muscle, improving neuroplasticity essential for movement recovery \cite{marquez-chin_functional_2020}. In order to improve gait rehabilitation a push should therefore be made to improve the current FES stimulation strategies in order to make them more effective and adaptable.
+
+Most existing FES systems on the market still rely on open-loop systems, mostly due to their simplicity\cite{braz_functional_2009}. However this typically requires continuous or repeated user input (ususally via a device button) for muscle activation, and consequently requires a lot of attention \cite{hayami_development_2022}. This method is therefore not only burdensome and prone to human error but also may be dangerous due to the risk of falls. Another major limitation is that it lacks adaptability in stimulation intensity, potentially leading to inefficient stimulation patterns, overstimulation, increased fatigue and discomfort. The human muscular system is inherently non-linear and time-dependent with factors such as fatigue, voluntary interaction, spasticity and muscle habituation causing constantly changing muscular responses \todo{source}. As a result open-loop stimulation is highly suboptimal, and closed-loop systems capable of real-time adaptation should be considered in order to improve safety, efficiency and user comfort.
+
+Two types of closed-loop control systems are proposed here. The first system relies on joint angle feedback and a preset stimulation sequence. It dynamically adjusts stimulation intensity based on the deviation from well-known reference joint angles. The preset stimulation sequence, although inefficient for a chronic device could work well for the treadmill-based gait training this project aims to improve. This relatively simple form of closed loop would already be large improvement reducing the high attention burden on users, minimizing overstimulation and lowering the risk of falls.  
+
+The second closed-loop system builds upon the first by incorporating an online gait phase detection algorithm, which would allow for more precise timing of gait phase transitions, more-so mimicing the nervous system's natural control of gait. This approach is an improvement upon the first system, as well as traditional open-loop implementation by allowing the stimulation sequence to adapt dynamically rather than being preset. This would further enhance safety and be more efficient, particularly in patients with some voluntary muscular control.
+
+
 
 \subsection{Project Context}
+
 This project builds upon an ongoing effort at the REHassist lab at EPFL for developing hybrid strategies using robotics and Functional Electrical Stimulation (FES) for treating neurological motor disorders such as stroke, cerebral palsy and spinal cord injury. 
 
-Importantly this project uses hardware previously developed at the REHassist lab. Firstly the StimWave3 which is a custom, 20 channel, electrostimulator. It can generate continuous or pulsed currents with adjustable frequency, pulse width, and amplitude. Secondly there are the wireless IMUs that output angular velocity and acceleration along three axis. 
+Importantly this project uses hardware previously developed at the REHassist lab. Firstly there is the StimWave3 which is a custom, 20 channel, electrostimulator capable of generating continuous or pulsed currents with adjustable frequency, pulse width, and amplitude. Secondly there are the wireless IMUs that output angular velocity and acceleration along three axis. 
 
-Software wise, there is a codebase that has been developed for hybrid FES robotics strategies using the StimWave hardware. Specifically there is a codebase that was used for FES with a Leg-Press robotic trainer called LegoPress \cite{olivier_legopress_2014}. That code was adapted last semester by another student for the closed loop gait application. A goal of this project is to further develop that code. However, a part of that must include refactoring of this code. This is because the closed loop control logic was implemented on top of the legopress logic and everything was effectively implemented in one file leading to poor code quality. This is further expanded upon in the implementation section on refactoring.
+Software wise, there is a codebase that has been developed for hybrid FES robotics strategies using the StimWave hardware. Specifically there is a codebase that was used for FES with a Leg-Press robotic trainer called LegoPress \cite{olivier_legopress_2014}. That code was adapted last semester by another student for the closed loop gait application. A goal of this project is to further develop the codebase. However, a part of that must include refactoring of this code. This is because the closed and open loop control logic was implemented on top of the legopress logic and everything was effectively implemented in one file, leading to poor code quality. This is further expanded upon in the implementation section on refactoring.
+
+The project on closed loop gait application mentioned above was also intended to lay some of the groundwork for this project. However upon starting it became clear that the code, open loop design, closed loop design and implementation would need to be rethought and implemented in a new manner.
+
+\subsection{Background}
+
+\subsection{Contributions}
+
+\subsection{Outline}
 
 
 
-\todo{finish and rewrite}
-
-\subsection{Motivation}
 
 \subsection{Project limitation}
 

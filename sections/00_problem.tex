@@ -1,0 +1,25 @@
+\begin{document}
+%=================================================================
+%                           Start Document
+%=================================================================
+\setstretch{1.6}
+\section{Problem Description}
+\lhead{Problem Description} % section header
+
+Functional Electrical Stimulation (FES) is a technique for rehabilitating motor functions in individuals with neurological impairments, such as those caused by stroke or spinal cord injury. While FES can facilitate gait rehabilitation, challenges persist in achieveing a walking pattern that is natural, comfortable and tailored to individual patients. Despite technological advances, most FES systems on the market still rely on Open-Loop systems that lack adaptability, leading to inefficient stimulation patterns, increased fatigue and discomfort.
+
+This project aims to address these limitations by developing a closed-loop FES system that integrates real-time feedback from Inertial Measurements Units (IMUs) to dynamically adjust muscle stimulation in order to recreate a natural, comfortable gait cycle. The work is structured into the following tasks:
+\begin{itemize}
+    \item \textbf{Refactor Code Base:} Refactor and modularize legacy software in order to create a maintainable and scalable code base for FES gait control applications.
+    \item \textbf{Determine FES stimulation parameters:} Determine the characteristics of the current simulation waveform for FES. Validate and make necessary changes so that the current output behaves as expected.
+    \item \textbf{Determine Stimulation Sequence:} Design and implement an open-loop stimulation sequence that is capable of replicating a step. This involves selecting the muscles to stimulate, defining the timings and durations and validating that the sequence is generalizable by testing on multiple subjects.
+    \item \textbf{Integrate New Wireless IMUs:} Replace the previously utilized wired IMUs with new wireless IMUs developed by the laboratory.
+    \item \textbf{Implement Knee Angle Estimation:} Develop a method to estimate knee angles using IMU data by incorporating sensor fusion algorithms. Validate the estimation and the delay characteristics.
+    \item \textbf{Implement Gait Phase Detection:} Implement a phase detection algorithm in C++ that has already been developed and tested in python.
+    \item \textbf{Design and Implement Closed-Loop FES:} Finally design a closed-loop FES system for gait rehabilitation using feedback from Inertial Measurement Units (IMUs) and the stimulation sequence found for the open loop. Conduct experiments to validate the efficacy of the system.
+\end{itemize}
+
+%=================================================================
+%                           End Document
+%=================================================================
+\end{document}

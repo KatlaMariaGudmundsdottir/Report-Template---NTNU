@@ -133,7 +133,7 @@ Initially, it was believed that a working open loop sequence had already been es
 \begin{figure} [h]
     \centering
     \includegraphics[width=0.99\linewidth]{images/wrongemg.png}
-    \caption{EMG measurements from two subjects used by a previous student to determine the initial stimulation sequence. Highlighted inside the red boxes are the portions the gait cycle where there is an erroneous measurement of muscle activation, which ultimately lead to an inaccurate stimulation sequence. (\textbf{Ta} - Tibialis Anterior, \textbf{Vm} - Vastus Medialis, \textbf{Rf} - Rectus Femoris, \textbf{Gs} - Gastrocnemius, \textbf{Hs} - Hamstrings, \textbf{Gluteus Maximus})}
+    \caption{EMG measurements from two subjects used by a previous student to determine the initial stimulation sequence. Highlighted inside the red boxes are the portions of the gait cycle where there is an erroneous measurement of muscle activation, which ultimately lead to an inaccurate stimulation sequence. (\textbf{Ta} - Tibialis Anterior, \textbf{Vm} - Vastus Medialis, \textbf{Rf} - Rectus Femoris, \textbf{Gs} - Gastrocnemius, \textbf{Hs} - Hamstrings, \textbf{Gluteus Maximus})}
     \label{fig:wrongemg}
 \end{figure}
 
@@ -365,8 +365,13 @@ A visualization of the closed loop control flow can be seen in figure \ref{cldia
 
 
 \subsubsection{Knee Angle Reference Curve}
-In order to use the error in knee angle as an input for the PI control it is important to have a good reference. Thankfully there is a lot of collected data on knee range of motion during gait. Knee range of motion has a specific curve during the gait cycle, a typical example can be seen in figure \todo{figure reference} 
-\todo{knee angle curve figure}
+In order to use the error in knee angle as an input for the PI control it is important to have a good reference. Thankfully there is a lot of collected data on knee range of motion during gait. Knee range of motion has a specific curve during the gait cycle, a typical example can be seen in figure \ref{fig:kneecurvetypical}.
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.99\linewidth]{images/B9780702043444000158_f015-005-9780702043444.jpg}
+    \caption{Typical knee angle values during healthy gait \cite{themes_biomechanics_2017}}
+    \label{fig:kneecurvetypical}
+\end{figure}
 \newline 
 
 \textit{Simplified Curve}
@@ -391,17 +396,20 @@ For the second bump:
 A_2 = 30, \quad f_2 = \frac{0.1}{6}, \quad \phi_2 = -\frac{\pi}{2} + 2\pi f_2 \cdot 80, \quad C_2 = 34
 \]
 
-A visualization of this curve can be seen in figure \todo{ref}. When comparing this however with the typical knee angle curve there are some major differences such as the height of the end of the second sinus curbe and height of the valley between the two curves. Because of these discrepancies another approach was attempted.
-\todo{simple curve figure}
+A visualization of this curve can be seen in figure \ref{fig:simplecurve}. When comparing this however with the typical knee angle curve there are some major differences such as the height of the end of the second sinus curbe and height of the valley between the two curves. Because of these discrepancies another approach was attempted.
+\begin{figure} {h}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/simpleKneeAngle.png}
+    \caption{Simplified knee angle curve during gait, created by combining two sinusoids}
+    \label{fig:simplecurve}
+\end{figure}
 \newline
 
 \textit{Fitted Curve}
 
-The second approach was based on extracting the curve by fitting a fourier series to the measured knee angle data during gait. A fourier series fitting is .... . Readers that unfamiliar with fourier series fitting are referred to \todo{source}. The data used for the fitting is from the open source data set of gait analysis measurements by camargo et al. \cite{camargo_comprehensive_2021}. For that dataset several subjects were fitted with, among other things, a goniometer attached to the knee angle in order to get exact measurements of the knee angle during walking on a treadmill. 
+The second approach was based on extracting the curve by fitting a Fourier series to the measured knee angle data during gait. A Fourier series fitting is a mathematical technique used to represent a periodic function as a sum of sine and cosine terms, allowing for the decomposition of complex waveforms into simpler harmonic components \cite{blackledget_chapter_2006}. The data used for the fitting is from the open source data set of gait analysis measurements by Camargo et al. \cite{camargo_comprehensive_2021}. For that dataset several subjects were fitted with, among other things, a goniometer attached to the knee angle in order to get exact measurements of the knee angle during walking on a treadmill. 
 
-\todo{Knee angle fitted curve figure}
-
-For extracting the curve a single dataset at t a single speed (approximately 1 m/s) was used. Then a Fourier seris is used to approcimate the periodic knee angle data. The series is expressed mathematically as:
+For extracting the curve a single dataset at a single speed (approximately 1 m/s) was used. Then a Fourier series is used to approximate the periodic knee angle data. The series is expressed mathematically as:
 \begin{equation}
 f(x) = a_0 + \sum_{i=1}^{n} \left( a_i \cos(2\pi i x) + b_i \sin(2\pi i x) \right)
 \end{equation}
@@ -412,8 +420,20 @@ f(x) = a_0 + \sum_{i=1}^{n} \left( a_i \cos(2\pi i x) + b_i \sin(2\pi i x) \righ
     \item \(n\) is the number of harmonics, which determines the complexity of the approximation.
 \end{itemize}
 
-In order to extract coefficient that best fit the data \texttt{curve\_fit}  function from \texttt{SciPy} is used. the number of harmonics (\textit{n}) is set to 3 in porder to balance accuracy and computational efficiency. This number provides enough flexibility to capture the primary general shape of the motion without overfitting to noise or adding unnecessary complexity. The  final curve is plotted alongside the original data in figre \todo{ref} which demonstartes how well the Fourier series captures the periodic behavior of the knee angle during gait. This improved resemblance to a physiological knee angle curve and since there is only a small change in computational complexity online with this more complicated equation led to the fitted curve being chosen as the curve used for the closed-loop implementation.
-\todo{Knee angle fitted curve w data figure}.
+In order to extract coefficient that best fit the data \texttt{curve\_fit}  function from \texttt{SciPy} is used. the number of harmonics (\textit{n}) is set to 3 in order to balance accuracy and computational efficiency. This number provides enough flexibility to capture the primary general shape of the motion without over fitting to noise or adding unnecessary complexity. The  final curve is plotted alongside the original data in figure \ref{fig:kneeangleref} which demonstrates how well the Fourier series captures the periodic behavior of the knee angle during gait. This improved resemblance to a physiological knee angle curve and since there is only a small change in computational complexity online with this more complicated equation led to the fitted curve being chosen as the curve used for the closed-loop implementation.
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.99\linewidth]{images/goodkneeangleref.png}
+    \caption{Fitted fourier series curve to experimental knee angle data from \cite{camargo_comprehensive_2021}}
+    \label{fig:kneeangleref}
+\end{figure}
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/fittedKneeAngleRef.png}
+    \caption{Final reference curve, obtained by fitting a fourier series to experimental knee angle data}
+    \label{fig:enter-label}
+\end{figure}
+\todo{fix figure}
 \newline
 
 \textit{Implementation}
@@ -421,13 +441,13 @@ In order to extract coefficient that best fit the data \texttt{curve\_fit}  func
 In order to use the fitted curve as the reference for the PI controller, the knee angle corresponding to the current percentage of the gait cycle must be extracted in real time. This process begins by determining which percentage of the gait cycle the system is currently in. This is calculated using the current time and the gait cycle duration set by the user. The corresponding knee angle is then retrieved from the fitted curve. Which is then fed to the PI controller.
 
 \subsubsection{Gait Cycle Duration}
-As mentioned the reference knee angle degree value depends on the gait cycle duration and current time, therefore setting the correct gait cycle duration for each user is an important step. Gait cycle duration defines the time required for one complete stride, encompasssing the full sequence of movements from both legs. 
+As mentioned the reference knee angle degree value depends on the gait cycle duration and current time, therefore setting the correct gait cycle duration for each user is an important step. Gait cycle duration defines the time required for one complete stride, encompassing the full sequence of movements from both legs. 
 
-When running the FES experiments on a treadmill this gait cycle duration will vary from user to user and is therefore important to calculate before starting the stimulation. The primary input is the treamill speed (\(v\)) in (m/s). The second essential parameter is the subjects leg length (\(L\)), measured as teh distance from the greater trochanter to te floor in meters \todo{source}. Then the Froude number (\(Fr)\) which is a widely used descriptor in gait analysis is:
+When running the FES experiments on a treadmill this gait cycle duration will vary from user to user and is therefore important to calculate before starting the stimulation. The primary input is the treadmill speed (\(v\)) in (m/s). The second essential parameter is the subjects leg length (\(L\)), measured as the distance from the greater trochanter to the floor in meters \cite{meinders_how_2021}. Then the Froude number (\(Fr)\) which is a widely used descriptor in gait analysis is:
 \begin{equation}
     Fr = \frac{v^2}{g \cdot L}
 \end{equation}
-Where g is gravitational acceleration. Once the Froude number is calculated the stride frequency (\(f_s\)) can be estimated using the following relationship \todo{source}:
+Where g is gravitational acceleration. Once the Froude number is calculated the stride frequency (\(f_s\)) can be estimated using the following relationship \cite{meinders_how_2021}:
 \begin{equation}
     f_s = \sqrt{\frac{g \cdot Fr}{L}}
 \end{equation}
@@ -469,7 +489,12 @@ The PI controller also incorporates a phase-specific adaptation. This is because
 \subsubsection{Feedforward Current}
 A feedforward current is implemented for each muscle individually to provide a baseline stimulation amplitude, ensuring sufficient activation to induce movement. It is set around the midpoint between the motor threshold and the maximum tolerable intesity found for each muscle during setup. 
 
-\todo{GUI of the Closed loop}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/clgui.png}
+    \caption{Graphical User Interface for Closed Loop FES, including functionality to tune Kp, Ki, set initial feedforward stimulation and maximum intensity (mA)}
+    \label{fig:clsetup}
+\end{figure}
 
 Including a feedforward current is particularly beneficial in FES systems because it provides a consisten baseline for muscle activation reducing reliance on reactibe feedback adjustments and ensuring smotther, more predictable responses during the giat cycle. It also helps address delays in muscle activation and mechenical response by esnuring timely stimulation even before feedback corrections take effect. Additionally, the feedforward current reduces the workload on the feeback controller by offloading the need for large corrective actions requiring large gain values, allowing the controller to focus on fine-tuning adjustments.
 
