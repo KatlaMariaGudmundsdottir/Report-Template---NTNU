@@ -427,15 +427,13 @@ For the second bump:
 A_2 = 30, \quad f_2 = \frac{0.1}{6}, \quad \phi_2 = -\frac{\pi}{2} + 2\pi f_2 \cdot 80, \quad C_2 = 34
 \]
 
+
 A visualization of this curve can be seen in figure \ref{fig:simplecurve}. When comparing this however with the typical knee angle curve there are some major differences such as the height of the end of the second sinus curbe and height of the valley between the two curves. Because of these discrepancies another approach was attempted.
 \begin{figure} {h}
     \centering
     \includegraphics[width=0.8\linewidth]{images/simpleKneeAngle.png}
     \caption{Simplified knee angle curve during gait, created by combining two sinusoids}
     \label{fig:simplecurve}
-\end{figure}
-\newline
-
 \textit{Fitted Curve}
 
 The second approach was based on extracting the curve by fitting a Fourier series to the measured knee angle data during gait. A Fourier series fitting is a mathematical technique used to represent a periodic function as a sum of sine and cosine terms, allowing for the decomposition of complex waveforms into simpler harmonic components \cite{blackledget_chapter_2006}. The data used for the fitting is from the open source data set of gait analysis measurements by Camargo et al. \cite{camargo_comprehensive_2021}. For that dataset several subjects were fitted with, among other things, a goniometer attached to the knee angle in order to get exact measurements of the knee angle during walking on a treadmill. 
