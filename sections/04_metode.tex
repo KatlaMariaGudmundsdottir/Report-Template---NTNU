@@ -198,8 +198,8 @@ Finally it was observed that there is a large discrepancy in when the rectus fem
 When comparing videos of the new sequence compared to the five muscle sequence, no discernible differences were found. The sequence also proved to be more comfortable, leading to the conclusion that rectus femoris may be removed from the sequence. This led to the choice of the final sequence visualized in figure \ref{fig:fianlsequence}. In order to ensure that the sequence was generalizanble across individuals it was then tested in three subjects, with results available in the result section on the open-loop sequence.
 
 
-\lhead{Implementation - IMU implementation}
-\subsection{IMU implementation}
+\lhead{Implementation - Wireless IMU Integration}
+\subsection{Wireless IMU Integration}
 \begin{wrapfigure}{r}{0.5\textwidth}
         \centering
     \includegraphics[width=\linewidth]{images/IMU_directions.png}
@@ -391,6 +391,7 @@ A closed-loop control system was implemented in order to improve the quality of 
     \label{fig:clsetupimg}
 \end{wrapfigure}
 
+
 A visualization of the closed loop control flow can be seen in figure \ref{cldiam}. The closed-loop takes in a knee angle reference that is fetched based on the current time and the gait cycle duration from the knee angle reference curve. Based on the the current time and gait cycle duration the current gait cycle percentage is extracted and used to determine which subphase of the gait the system should be in, based on this the muscles to stimulate are determined. The muscles that correlate to each subphase are based on the open-loop stimulation sequence, and can be seen in figure \todo{create figure for muscles}. Then for each muscle that should be stimulated a PI tuned for that specific muscle is run and there is a feedforward current that is summed with the PI current in order to get the current that will be sent to the StimWave board which then stimulates the muscles of the user. From the IMUs attached to the thigh and shank of the leg that should be stimulated the knee angle is then extracted and used as a feedback. A picture of the electrode and IMU placements on a single subject can be seen in figure \ref{fig:clsetupimg}.
 
 
@@ -398,7 +399,6 @@ A visualization of the closed loop control flow can be seen in figure \ref{cldia
 In order to use the error in knee angle as an input for the PI control it is important to have a good reference. Thankfully there is a lot of collected data on knee range of motion during gait. Knee range of motion has a specific curve during the gait cycle, a typical example can be seen in figure \todo{figure reference} 
 \todo{knee angle curve figure}
 \newline 
-
 \textit{Simplified Curve}
 
 Two different approaches to creating the reference curve were attempted. The first involved simply re-creating the general shape and amplitude of the typical knee angle curve by combination of two sinus curves tuned by-hand. The resulting curve modeled as the sum of two sinusoidal components, defined as:
@@ -424,7 +424,7 @@ A_2 = 30, \quad f_2 = \frac{0.1}{6}, \quad \phi_2 = -\frac{\pi}{2} + 2\pi f_2 \c
 A visualization of this curve can be seen in figure \todo{ref}. When comparing this however with the typical knee angle curve there are some major differences such as the height of the end of the second sinus curbe and height of the valley between the two curves. Because of these discrepancies another approach was attempted.
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{images/simpleKneeAngle.png}
+    \includegraphics[width=0.8\linewidth]{images/simpleKneeAngle.png}
     \caption{Caption}
     \label{fig:enter-label}
 \end{figure}
@@ -448,7 +448,19 @@ f(x) = a_0 + \sum_{i=1}^{n} \left( a_i \cos(2\pi i x) + b_i \sin(2\pi i x) \righ
 \end{itemize}
 
 In order to extract coefficient that best fit the data \texttt{curve\_fit}  function from \texttt{SciPy} is used. the number of harmonics (\textit{n}) is set to 3 in porder to balance accuracy and computational efficiency. This number provides enough flexibility to capture the primary general shape of the motion without overfitting to noise or adding unnecessary complexity. The  final curve is plotted alongside the original data in figre \todo{ref} which demonstartes how well the Fourier series captures the periodic behavior of the knee angle during gait. This improved resemblance to a physiological knee angle curve and since there is only a small change in computational complexity online with this more complicated equation led to the fitted curve being chosen as the curve used for the closed-loop implementation.
-\todo{Knee angle fitted curve w data figure}.
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/goodkneeangleref.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/fittedKneeAngleRef.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
 \newline
 
 \textit{Implementation}
