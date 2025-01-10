@@ -10,7 +10,7 @@
 As mentioned introduction wise this project builds upon the work and code base originally developed for the LegoPress \cite{olivier_legopress_2014} in C++ using Qt and further developed by a previous student. However the code quality had become poor with thousands of lines of code and multiple functionalities implemented in a singular file and class. Therefore before continuing on with the project a full refactoring of the code was necessary. The goal being to save time in the long run by creating modular, robust, readable code that could later be further developed for use in clinical trials.
 
 \subsubsection{Documentation}
-\begin{figure} [H]
+\begin{figure} [h]
 	\centering
 	\includegraphics[width=0.9\linewidth]{images/oldDoxy.png}
 	\caption{Doxygen generated callgraph for the original mainWindow function before refactoring}
@@ -228,13 +228,47 @@ In order to calculate the orientation estimates simple integration of gyroscope 
 
 It has been demonstrated in many publications (e.g. \cite{peng_cheng_joint-angle_2010}, \cite{sabatini_estimating_2011} and the sources therein) that IMU data can be used to calculate hinge joint angles. Hinge joint angles can be calculated by integrating the difference of both angular rates around the corresponding coordinate axis. In order to remove the inevitable drift of this approach several techniques using accelerometers have been suggested \cite{peng_cheng_joint-angle_2010}. As time for this project is limited, finding an algorithm that would not be very time consuming to implement was a priority. Towards this end a popular python library named \textit{Attitude and Heading Reference Systems (AHRS)} \cite{noauthor_ahrs_nodate} was consulted with the aim of using the python implementations as starting off point for the necessary C++ implementation. Four main methods were selected for evaluation based on their applicability, robustness and ease of implementation. Firstly the Mahony filter \todo{source} which \todo{finish}. Secondly complimentary filter \todo{source} which \todo{finish}. The two other methods, the Extended Kalman filter and Madgwick filter are compared and contrasted below for this particular application. 
 
+\subsubsection{Extended Kalman Filter}
+
+The extended kalman filter (EKF) is a widely recognized and popular state-space algorithm that utilizes a probabilistic framework for state estimation in non-linear systems. Its ability to optimally combine noisy sensor measurements with a mathematical model of the system and adaptability to non-linear dynamics makes it theoretically a robust choice for orientation estimation. This section does not go into detailed explanations on the EKF itself, but rather discusses its possible usage, readers unfamiliar with the Extended Kalman Filter are therefore referred to \todo{edmund brekke book}. The suggested implementation sketched below is inspired by \cite{sabatini_kalman-filter-based_2011} and \cite{noauthor_extended_nodate} with the main difference being the implementation here does not require magnetic sensors.
+
+
+\textit{Theoretical implementation}
+
+In this context, the state vector represents the orientation of the IMU represented as a quaternion with respect to a reference frame. The filter uses a process model to predict the next state and a measurement model to correct the prediction using sensor data. In this context the prediction step would estimate the next orientation based on angular velocity measurements from the gyroscope.
+\[
+\mathbf{q}_{k|k-1} = \mathbf{q}_{k-1} + \frac{\Delta t}{2} \mathbf{q}_{k-1} \otimes \mathbf{\omega}_k
+\]
+Where \( \mathbf{\omega} \) is the angular velocity vector measured by the gyroscope, \( \otimes \) denotes quaternion multiplication and \( \Delta t \) is the sampling interval. The state covariance matrix would also be updated in the standard manner.
+
+The correction step would then integrate accelerometer data to refine the orientation estimate. The accelerometer provides a measurement of the grabity vector in the sensor frame, which can be compared to the predicted gravity vector from the prediction step.
+\[
+\mathbf{z}_k = h(\mathbf{q}_k) = \mathbf{R}(\mathbf{q}_k) \mathbf{g}
+\]
+where \( \mathbf{R}(\mathbf{q}_k) \) is the rotation matrix corresponding to the predicted quaternion \( \mathbf{q}_k \), and \( \mathbf{g} \) is the gravity vector in the global frame.
+
+The innovation, or measurement residual, is computed as:
+\[
+\mathbf{y}_k = \mathbf{z}_k^{\text{meas}} - h(\mathbf{q}_{k|k-1})
+\]
+Finally the corrected state would be updated as 
+\[
+\mathbf{q}_{k|k} = \mathbf{q}_{k|k-1} + \mathbf{K}_k \mathbf{y}_k
+\]
+
+\textit{Evaluation}
+
+There are, however, challenges associated with using the EKF for real-time knee angle estimation. The first is the computational complexity. The EKF requires the computation of jacobians and matrix multiplications, which may introduce latency and therefore poor closed-loop performance. The second is sensor misalignment, for the EKF to work optimally the IMUs must be aligned, any misalignment would introduce systematic errors. Third is acceleration artifacts. The accelerometer data used to correct gyroscope drift is susceptible to artifacts caused by motions such as foot strikes, this could lead to significant deviations from the assumed gravitational reference vector, leading to erroneous corrections. Finally there is the sensitivity to initial conditions. The EKF requires accurate initialization of state vector and covariance matrix. Poor initialization can cause the filter to diverge. For these reasons and the complexity of its implementation along with time constraints of this project it was decided to not implement the extended kalman filter for knee angle estimation.
+
 
 
 \subsubsection{Madgwick Filter}
 
 The Madgwick filter is a gradient-descent-based orientation estimation algorithm. It provides a computationally efficient framework to estimate the orientation based on using gyroscope data for the prediction step and accelerometer data for the correction step. 
+\newline
 
 \textit{Theoretical Implementation}
+
 The Madgwick filter would be implemented on the thigh and shank IMUs individually. The implementation outlined here is adapted from the original internal report by S. Madgwick  \cite{madgwick_ecient_nodate} and the documentation of the AHRS implementation \cite{noauthor_madgwick_nodate}. In the Madgwick filter the orientation of the sensor frame relative to the earth frame is represented as a quaternion \( \mathbf{q_{\omega , t}} \):
 \[
 \mathbf{q_{\omega , t}} = 
@@ -243,6 +277,7 @@ q_w & q_x & q_y & q_z
 \end{bmatrix}^T
 \]
 where \( q_w \) is the scalar part, and \( q_x, q_y, q_z \) are the vector components.
+\newline
 
 \textit{Prediction step: Integration of Angular Velocity}
 
@@ -264,8 +299,10 @@ where \( \Delta t \) is the sampling period and
 \end{bmatrix}
 \)
 is the tri-axial angular rate, in rad/s, measured in the sensor frame and represented as a pure quaternion. For a more detailed explanation on orientation estimation based solely on angular rate and quaternion kinematics the reader is referred to \cite{sola_quaternion_2017}.
+\newline
 
 \textit{Correction step: Gradient Descent}
+
 To correct for gyroscope drift, the Madgwick filter uses accelerometer data to align the predicted gravity vector with the measure gravity vector. The objective funciton minimizes the error between the two:
 \[
 f(\mathbf{q}) = \mathbf{q}^* \otimes \mathbf{g} \otimes \mathbf{q} - \mathbf{a}
@@ -289,7 +326,7 @@ It follows that the corrected quaternion is updated using a gradient descent ste
 \]
 
 where \( \mu \) is the step size (gain), which controls the convergence rate.
-
+\newline
 
 \textit{Application to Knee Angle Estimation}
 
@@ -304,6 +341,7 @@ The knee angle \( \theta \) is derived from the relative orientation quaternion:
 \theta = \arccos{\left( 2q_w^2 - 1 \right)},
 \]
 where \( q_w \) is the scalar component of \( \mathbf{q}_{\text{relative}} \).
+\newline
 
 \textit{Evaluation}
 
@@ -316,10 +354,6 @@ However there are some potential limitations. Due to the filters correction step
 
 The initial closed loop design involved the use of gait phase detection for use in determining which muscles should be stimulated. The plan was therefore to implement an on-line phase detection algorithm. Another student at the lab has decently developed a phase and subphase detection algorithm in python. The plan was therefore to take the newly developed algorithm, adapt it for C++ and implement it in its own thread in Qt. This process was expected to be quite straight forward and was therefore thought to fit within the time frame of the project.
 
-\subsubsection{The Algorithm}
-\todo{write a description of the algorithm by francesco}
-
-\subsubsection{Implementation}
 Upon starting the implementation process it however became clear that the algorithm would not be as simple to translate as expected. The issue was that the python implementation used a host of SciPy \cite{noauthor_scipy_nodate} functions in order to implement the algorithm. Scipy is a  widely used library for scientific computing in Python, providing modules for among other things signal processing \cite{noauthor_scipy_nodate}. Unfortunately, no equivalent library, capable of replacing SciPy's functionality exists in C++. After an extensive search for alternatives, it became clear that replicating the necessary SciPy functions would be unavoidable.
 
 To address this, a new class, \texttt{GaitPhaseDetector}, was created to house the custom utility functions and the detection algorithm itself. It proved time consuming and challenging to ensure that the new functions matched the exact functionality of the SciPy functions since the SciPy functions depended on nested calls to other SciPy utilities and the logic could be challenging to interpret. Matching the functionality is hugely important since the entire gait phase and subphase detection algorithm was built and tuned based on the usage of these functions. Despite the challenges, the class was developed and initial results were promising, indicating some degree of success in detecting the peaks needed to then detect the phases of gait as seen in figure \ref{fig:peaks}. 
@@ -345,11 +379,11 @@ A closed-loop control system was implemented in order to improve the quality of 
 
 \begin{figure} [H]
     \centering
-    \includegraphics[width=0.98\linewidth]{images/controldiam3.png}
+    \includegraphics[width=1.1\linewidth]{images/controldiam3.png}
     \caption{Closed-loop control diagram}
     \label{fig:cldiam}
 \end{figure}
-
+\newpage
 \begin{wrapfigure}{r}{0.37\textwidth}
     \centering
     \includegraphics[width=\linewidth]{images/clsetupimg.jpg}
