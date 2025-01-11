@@ -20,6 +20,9 @@
 \SecondPage
 \pagebreak
 
+\subfile{sections/00_sammendrag.tex}
+\newpage
+
 % creating table of contents 
 \setlength{\parskip}{0em}
 \lhead{Innhold} % section header
@@ -27,6 +30,7 @@
 \tableofcontents
 \renewcommand{\baselinestretch}{1.0}\normalsize
 \setlength{\parskip}{1em}
+
 \newpage
 
 % adding the different sections
@@ -38,14 +42,39 @@
 \newpage
 \subfile{sections/03_bakgrunn.tex}
 \newpage
-\subfile{sections/04_metode.tex}
+\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}Software Refactoring}
+\subfile{sections/refactoring.tex}
 \newpage
-\subfile{sections/05_resultater.tex}
+\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}Functional Electrical Stimulation Setup}
+\subfile{sections/FESdesign.tex}
 \newpage
-\subfile{sections/06_drofting.tex}
+\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}{Open-Loop Stimulation Sequence}}
+\subfile{sections/OpenLoop.tex}
 \newpage
-\subfile{sections/07_further_work.tex}
+\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}{Knee Angle Estimation}}
+\subfile{sections/kneeAngle.tex}
 \newpage
+\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}{Gait Phase Detection}}
+\subfile{sections/phaseDetection.tex}
+\newpage
+\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}{Closed-Loop FES Control}}
+\subfile{sections/closedLoop.tex}
+\newpage
+
+% \subfile{sections/04_metode.tex}
+% \newpage
+% \subfile{sections/05_resultater.tex}
+% \newpage
+% \subfile{sections/06_drofting.tex}
+% \newpage
+% \subfile{sections/07_further_work.tex}
+% \newpage
 \subfile{sections/07_konklusjon.tex}
 \newpage
 \subfile{sections/09_vedlegg.tex}

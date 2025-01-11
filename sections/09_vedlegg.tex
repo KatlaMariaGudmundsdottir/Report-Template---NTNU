@@ -13,39 +13,6 @@
   
 %\end{enumerate}
 
-\begin{table}[H]
-\centering
-\renewcommand{\arraystretch}{1.3} % Adjust row height for readability
-\begin{tcolorbox}[
-    colback=white,      % Background color
-    colframe=black,     % Border color
-    arc=3mm,            % Rounding corners
-    boxrule=0.5mm,      % Border thickness
-    width=\textwidth,   % Full width
-    halign=center       % Center-align the content
-]
-\begin{tabular}{p{0.25\textwidth} | p{0.7\textwidth}} % Simple tabular with fixed column widths
-\textbf{Class Name} & \textbf{Description} \\ \hline
-\texttt{MadgwickFilter} & Utility class that has functions to apply the Madgwick algorithm for filtering IMU data to output orientation quaternions for the thigh and shank IMUs \\
-
-\texttt{DelayLogger} & Utility class used for logging the delays created by processing IMU data. \\
-
-\texttt{IMU} & One class is initiated for each IMU. The class takes in the stream of data from the IMU. It sends the raw data to mainwindow for visualization in the GUI. It sends the data through the \texttt{MadgwickFilter} and sends the outputted quaternions to the \texttt{AngleCalculator} \\
-
-\texttt{AngleCalculator} & Receives the orientation quaternions for the shank and thigh IMUs and calculates the knee angle that is then sendt to the \texttt{LoopController} where it is used as feedback for the closed loop.\\
-
-\texttt{GaitPhaseDetector} & Detects the current gait phase and gait subphase based on the angular velocity along the z axis from the shank IMUs. This also includes custom made peak detection function. This class needs further work. \\
-
-\texttt{LoopController} & Manages the open loop and closed-loop control system. Receives the knee angle and sets the channel and stimulation current based on the mapping between muscles and channels. \\
-
-\texttt{MessageHandler} & Transforms information into compatible byte messages which are sendt and received over the serial interface with the StimWave3 \\
-\end{tabular}
-\end{tcolorbox}
-\caption{Class overview and functionality.}
-\label{tab:class-overview}
-\end{table}
-
-
 
 
 \subsection{parameters for closed loop stimulation}

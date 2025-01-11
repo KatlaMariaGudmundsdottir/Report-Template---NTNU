@@ -314,3 +314,46 @@
 % Tables
 \usepackage{tcolorbox} % Add this to your preamble
 \usepackage{array}     % For better column alignment
+
+% Title pages
+\newcommand{\sectiontitlepage}[2]{%
+  \clearpage
+  \thispagestyle{empty} % Remove headers/footers for the title page
+  \vspace*{2cm} % Adjust vertical spacing (moves the title down)
+  \begin{center}
+    \hrule\vspace{0.5cm} % Line above
+    {\Large \bfseries Section #1}\\[0.5cm] % Section number
+    {\Huge\bfseries #2} % Section title
+    \vspace{0.5cm}\hrule % Line below
+  \end{center}
+  \vspace*{\fill}
+  \clearpage % Start the next section on a new page
+}
+% \newcommand{\sectiontitle}[2]{%
+%   %\vspace*{0.0000001cm} % Adjust vertical spacing before the title
+%   % \noindent
+%   % \hrule\vspace{0.5cm} % Line above
+%   \begin{center}
+%     \vspace{1.5cm}
+%   {\Large \bfseries Section #1}\\[0.5cm] % Section number
+%   {\Huge\bfseries #2} % Section title
+%   \end{center}
+%   \vspace{0.6cm}\hrule % Line below
+%   \vspace*{0.5cm} % Adjust vertical spacing after the title
+% }
+
+\usepackage{calc} % For measuring text height
+
+\newcommand{\sectiontitle}[2]{%
+  \vspace{1.5cm} % Fixed vertical space before the section title
+  \begin{center}
+    {\Large \bfseries Section #1}\\[0.5cm] % Section number with consistent spacing
+    {\Huge\bfseries \strut#2} % Section title with consistent height
+  \end{center}
+  \vspace{0.6cm}
+  \hrule % Line below the title
+  \vspace{0.5cm} % Fixed vertical space after the title
+}
+
+
+
