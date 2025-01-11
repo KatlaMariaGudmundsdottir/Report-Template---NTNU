@@ -2,12 +2,14 @@
 %=================================================================
 %                           Start Document
 %=================================================================
-\section{Introduction }
+\sectiontitle{3}{Introduction}
 \lhead{Introduction} % section header
 
 \setstretch{1.6}
 
+
 \subsection{Motivation}
+\lhead{Introduction - Motivation}
 
 Several conditions may cause lower limb motor disorders including stroke, cerebral palsy and muscular dystrophy \cite{hayami_development_2022}. There are around 101 million people living with the effects of stroke \cite{noauthor_key_nodate}, nine of ten of which experience gait disorders \cite{schaechter_motor_2004}. Hemiparesis, which is a condition characterized by weakness or partial paralysis on one side of the body effect 65\% of stroke victims \cite{wist_muscle_2016} and is a primary contributor to gait disorders. Losing the ability to move voluntarily can have decastating consequences for both the independence and quality of life of the person affected \cite{marquez-chin_functional_2020}. There is therefore a large need for effective rehabilitation techniques for these patients. This project implements a system aimed at improving rehabilitation specifically for stroke patients struggling with hemiparetic gait disorders, however the control systems are applicable to the treatment of neurological motor disorders in general.
 
@@ -19,9 +21,11 @@ Two types of closed-loop control systems are proposed here. The first system rel
 
 The second closed-loop system builds upon the first by incorporating an online gait phase detection algorithm, which would allow for more precise timing of gait phase transitions, more-so mimicing the nervous system's natural control of gait. This approach is an improvement upon the first system, as well as traditional open-loop implementation by allowing the stimulation sequence to adapt dynamically rather than being preset. This would further enhance safety and be more efficient, particularly in patients with some voluntary muscular control.
 
-\subsection{Background}
 
+\subsection{Background}
+\lhead{Introduction - Background}
 \subsubsection{Hemiparetic Stroke and the Role of FES}
+\todo{fix sources for whole section}
 
 Hemiparetic stroke, a common result of cerebrovascular accidents, often causes motor impairments on one side of the body, disrupting the coordination needed for normal gait. These impairments manifest as asymmetry, reduced speed, and inefficiency, severely limiting mobility and quality of life. Contributing factors include muscle weakness, spasticity, and loss of motor control.
 
@@ -44,6 +48,7 @@ In several sudies \todo{examples} dynamic models are used to establish a relatio
 
 Despite the advancement in FES control strategies, the application of nonlinear control and dynamic models to gait rehabilitation reamains very limited. Most studies employing more complex control strategies focus on single-muscle stimulation, and very few of them utilize IMUs for feedback. Furthermore, models capable of capturing the dynamics of full gait do not yet exist. Resulting in the conclusion that for gait rehabilitation the most applicable solution remains to be linear control with possible enhancements by incorporating model-free adaptive control.
 
+\lhead{Introduction - Project Interpretation}
 \subsection{Project Interpretation}
 This project aims to develop a closed-loop functional electrical stimulation control system for gait rehabilitation following hemiparetic stroke. To that end several time consuming steps needed to be completed before moving on to direct closed loop design. Despite the broad scope, the primary goal was to produce reliable, well-documented work grounded in established theory and literature. This approach ensures that the project can serve as a solid foundation for further development and eventual clinical application.
 
@@ -54,7 +59,7 @@ This project also implements a control system for stimulation of one leg only at
 
 
 \subsection{Project Context}
-
+\lhead{Introduction - Project Context}
 This project builds upon an ongoing effort at the REHassist lab at EPFL for developing hybrid strategies using robotics and Functional Electrical Stimulation (FES) for treating neurological motor disorders such as stroke, cerebral palsy and spinal cord injury. 
 
 Importantly this project uses hardware previously developed at the REHassist lab. Firstly there is the StimWave3 which is a custom, 20 channel, electrostimulator capable of generating continuous or pulsed currents with adjustable frequency, pulse width, and amplitude. Secondly there are the wireless IMUs that output angular velocity and acceleration along three axis. 
@@ -66,7 +71,7 @@ The project on closed loop gait application mentioned above was also intended to
 
 
 \subsection{Contributions}
-
+\lhead{Introduction - Contributions}
 This project resulted in several contributions to the furthering of closed-loop FES for gait rehabilitation, particularly within the REHassist lab. A modualr and maintianable code base was established through comprehensice refactoring of legacy software, ensuring sclability and reausability. The project introduced a robust methodology for determining stimulation parameters, aligning them with clinical standards.
 
 A key contribution is the design and validation of the open-loop stimulation sequence capable of replicating a step for a range of users. This sequence was tested on multiple subjects, demosntrating generalizability and creating the basis for further closed-loop implementation. Wireless inertial measurement units (IMUs) were also successpully integrated. Several orientation estimation methods were evaluated and an adapted Madgwick filter was implemented in order to estimate knee angles accurately, enabling real-time feedback control.
@@ -77,6 +82,7 @@ Beyond the technical contributions, this report provides a transparent analysis 
 
 
 \subsection{Outline}
+\lhead{Introduction - Outline}
 This work is structured into first this introduction which highlights the motivation behind the research and the project scope, objectives, and contributions are outlined. Thereafter there is a background section that explores the principles of FES and gait mechanisms.
 
 The main body of the thesis is divided into six core topics, each addressing a specific task. These sections generally include methods, implementation, results, and discussion, with some also featuring design and further work subsections.
