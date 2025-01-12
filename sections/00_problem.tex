@@ -5,13 +5,13 @@
 \setstretch{1.6}
 \sectiontitle{1}{Problem Description}
 \lhead{Problem Description} % section header
-Functional Electrical Stimulation (FES) is a technique used to restore motor function in individuals with neurological impairments, such as those resulting from stroke. While FES has shown promise in gait rehabilitation \todo{source}, current systems face significant challenges in delivering comfortable and effective stimulation. Despite technological advances, most commercially available systems still rely on open-loop control, which lacks adaptability, leading to issues in recreating the gait cycle, excessive muscle fatigue and discomfort. As a consequence, the full potential of this valuable rehabilitation technique remains underutilized.
+Functional Electrical Stimulation (FES) is a technique used to restore motor function in individuals with neurological impairments, such as those resulting from stroke. While FES has shown promise in gait rehabilitation\todo{source}, current systems face significant challenges in delivering comfortable and effective stimulation. Despite technological advances, most commercially available systems still rely on open-loop control, which lacks adaptability, leading to issues in recreating the gait cycle, excessive muscle fatigue and discomfort. As a consequence, the full potential of this valuable rehabilitation technique remains underutilized.
 
 This project aims to address these limitations by developing a closed-loop FES system that integrates real-time feedback from Inertial Measurements Units (IMUs) to dynamically adjust stimulation in order to recreate a natural, comfortable gait cycle. The work is structured into the following tasks:
 \begin{itemize}
     \item \textbf{Refactor Code Base:} Refactor and modularize legacy software to create a maintainable and scalable code base for FES gait control.
     \item \textbf{Determine FES parameters:} Define the stimulation waveform parameters, validate and adjust code to ensure expected output behavior.
-    \item \textbf{Design Stimulation Sequence:} Select the muscles, their stimulation timings and durations in order to create and open-loop stimulation sequence that successfully recreates a step. Test the generalizability by validating on several subjects.
+    \item \textbf{Design Stimulation Sequence:} Select the muscles, their stimulation timings and durations in order to create an open-loop stimulation sequence that successfully recreates a step. Test the generalizability by validating on several subjects.
     \item \textbf{Integrate Wireless IMUs:} Replace wired IMUs with newly developed wireless versions.
     \item \textbf{Implement Knee Angle Estimation:} Develop and validate knee angle estimation using IMU data and sensor fusion algorithms.
     \item \textbf{Implement Gait Phase Detection:} Implement the existing Python gait phase detection algorithm in C++.
