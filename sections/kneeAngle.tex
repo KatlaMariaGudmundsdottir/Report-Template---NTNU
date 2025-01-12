@@ -1,5 +1,5 @@
 \begin{document}
-\sectiontitle{7}{Knee Angle Estimation}
+\sectiontitle{8}{Knee Angle Estimation}
 \setstretch{1.6}
 
 Feedback for the closed-loop control system was designed to rely on the knee angle, resulting in the necessity of a robust method of extracting the knee angle from the IMU measurements. This realized by mounting one IMU on the shank and one on the thigh, as can be seen in figure \ref{fig:clsetupimg}. The angle between these two segments could then be calculated using the relative orientation of the IMUs. However, determining this angle requires an algorithm capable of providing accurate, low-latency orientation estimates. 
@@ -25,22 +25,22 @@ It has been demonstrated in many publications (e.g. \cite{peng_cheng_joint-angle
 \subsubsection{Validation of the Knee Angle Estimation}
 Accurate knee angle estimation is critical for the closed loop FES application. Therefore the Madgwick knee angle stimation technique was validated by comparing the IN-House IMU based knee angle estimation with the DELSYS IMU base knee angle estimate as a benchmark. Delsys IMUs provide high-quality orientation data by leveraging advanced sensor fusion algorithms, designed specifically for biomechanical and movement studies \todo{source add more detail}. 
 
-\begin{wrapfigure}{r}{0.3\textwidth} 
+\begin{wrapfigure}{r}{0.35\textwidth} 
     \centering
     \includegraphics[width=\linewidth]{images/delsyssetup.jpg}
     \caption{Caption}
     \label{fig:enter-label}
 \end{wrapfigure}
 
-The method for knee angle estimation using the In-House IMUs is described throroughly in the methdods section "Knee Angle Estimation". The method for extracting the knee angle from the Delsys sensors involved capturing the orientation data that the sensors provide already having used sensor fusion. The relative orientation between the two sensors is then computed by taking the inverse of the thighs sensoræs rotation and applying it to the shank sensoræs rotation. This relative rotation is then converted to Euler angles from which the rotation about the x-axis is extracted:
+The method for knee angle estimation using the In-House IMUs is described thoroughly in the methods section "Knee Angle Estimation". The method for extracting the knee angle from the Delsys sensors involved capturing the orientation data that the sensors provide already having used sensor fusion. The relative orientation between the two sensors is then computed by taking the inverse of the thigh sensor's rotation and applying it to the shank sensor's rotation. This relative rotation is then converted to Euler angles from which the rotation about the x-axis is extracted:
 \begin{equation}
     \theta_{\text{knee}} = \text{Euler}_x \left( \mathbf{q}_{\text{thigh}}^{-1} \otimes \mathbf{q}_{\text{shank}} \right)
 \end{equation}
 
-The validation experiment consisted of mounting the Delsys IMUs and In-House IMUs on the thigh and shank as seen in figure \todo{ref}. The subject was then instructed to sit and move their leg from resting on the ground at approximately a 90 degree angle to resting it on a chair at a full extension, meaning approximately zero degrees. In order to compare the two estimates, the computed knee angles were synchonized and compared over a shared time range. Linear interpolation was applied to both datasets to align them temporally, accounting for potential differences in sampling rates and starting times. The synchronized data allows for a direct comparison as can be seen in figure \ref{fig:t11}. 
+The validation experiment consisted of mounting the Delsys IMUs and In-House IMUs on the thigh and shank as seen in figure \todo{ref}. The subject was then instructed to sit and move their leg from resting on the ground at approximately a 90 degree angle to resting it on a chair at a full extension, meaning approximately zero degrees. In order to compare the two estimates, the computed knee angles were synchronized and compared over a shared time range. Linear interpolation was applied to both datasets to align them temporally, accounting for potential differences in sampling rates and starting times. The synchronized data allows for a direct comparison as can be seen in figure \ref{fig:t11}. 
 
 \subsection{Algorithm Evaluation}
-Four main methods were selected for evaluation based on their applicability, robustness and ease of implementation. These were the complementary filter, the Mahnoy filter, the Madgwick filter and finally the Extended Kalman Filter.
+Four main methods were selected for evaluation based on their applicability, robustness and ease of implementation. These were the complementary filter, the Mahony filter, the Madgwick filter and finally the Extended Kalman Filter.
 
 The first method considered was the complementary filter, which offers the simplest approach. This filter relies on a weighted combination of data from accelerometers and gyroscopes, leveraging their complementary characteristics. Low-frequency data from the accelerometer provides reliable long-term orientation estimates due to the absence of drift, while high-frequency data from the gyroscope captures rapid angular changes with greater precision. By blending these data streams, the complementary filter achieves effective orientation estimation without the need for complex calculations. Its primary strengths lie in its simplicity, ease of implementation, and extremely low computational cost, making it an appealing choice for systems with limited resources. However, the complementary filter is less robust than the Mahony filter in scenarios involving dynamic motion. External accelerations, such as those caused by foot strikes, can corrupt accelerometer data and lead to errors. \todo{sources}
 
@@ -102,7 +102,7 @@ is the tri-axial angular rate, in rad/s, measured in the sensor frame and repres
 
 \paragraph*{Correction step: Gradient Descent}
 
-To correct for gyroscope drift, the Madgwick filter uses accelerometer data to align the predicted gravity vector with the measure gravity vector. The objective funciton minimizes the error between the two:
+To correct for gyroscope drift, the Madgwick filter uses accelerometer data to align the predicted gravity vector with the measure gravity vector. The objective function minimizes the error between the two:
 \[
 f(\mathbf{q}) = \mathbf{q}^* \otimes \mathbf{g} \otimes \mathbf{q} - \mathbf{a}
 \]
@@ -142,7 +142,7 @@ The knee angle \( \theta \) is derived from the relative orientation quaternion:
 where \( q_w \) is the scalar component of \( \mathbf{q}_{\text{relative}} \).
 
 \paragraph*{Software Realization}
-In order to implement the madgwick filter the AHRS library was utilized \cite{noauthor_madgwick_nodate} and built upon. In order to be used for knee angle estimation some output functions needed to be added to the library and the equations outlined in the "application to knee angle estimation" had to be added. The knee angle estimation was also threaded such that it would not produce delays in the main thread or the closed loop threads. 
+In order to implement the Madgwick filter the AHRS library was utilized \cite{noauthor_madgwick_nodate} and built upon. In order to be used for knee angle estimation some output functions needed to be added to the library and the equations outlined in the "application to knee angle estimation" had to be added. The knee angle estimation was also threaded such that it would not produce delays in the main thread or the closed loop threads. 
 
 A thorough delay logging was also implemented in order to validate that the filtering and calculations did not introduce too large delays that would introduce issues in the closed loop control. \todo{insert delay results}
 
@@ -154,31 +154,31 @@ A thorough delay logging was also implemented in order to validate that the filt
     \label{fig:t11}
 \end{figure}
 
-The results show that the adapted Madgwick filter does a good job of estimating the knee angle. However we see some slight drift, even though the Madgwick filter should in theory be robust to drift. It is however worth noting here that there are some clear inaccuracies in the Delys derived knee angle as well. Specifically we observe that there is a valley in the calculated knee angle followed by a flattening out of the curve when the knee is extended, this does not reflect the actual movement that the subject performs. The ideal performance of the IN-House developed knee angle estimation is therefore not necessarily an exact replication of the Delsys curve. The In-House algorithm does not seem to have this same artifact.
+The results show that the adapted Madgwick filter does a good job of estimating the knee angle. However we see some slight drift, even though the Madgwick filter should in theory be robust to drift. It is however worth noting here that there are some clear inaccuracies in the Delsys derived knee angle as well. Specifically we observe that there is a valley in the calculated knee angle followed by a flattening out of the curve when the knee is extended, this does not reflect the actual movement that the subject performs. The ideal performance of the IN-House developed knee angle estimation is therefore not necessarily an exact replication of the Delsys curve. The In-House algorithm does not seem to have this same artifact.
 
 \subsection{Discussion}
-The results of the knee angle stimulation demonstrate that the In-House IMU-based estimation method, which utilizes an adapted Madgwick filter, performs effectively in estimating knee joint angles during movement. However, slight drift in the estimation was observed, despite the theoretical robustness of the Madgwick algorithm to such errors. This drift could be attributed to several factors the first of which is that the way in which the algorithm is implemented assumes that the local coordinate axes of the IMUs are perfectly aligned with the anatomical knee joint axis. Any misalignment introduces errors in the computed knee angle, as the algoritm assumes that the relative orientation of the two IMUs reflects the hinge joint's motion accurately.
+The results of the knee angle stimulation demonstrate that the In-House IMU-based estimation method, which utilizes an adapted Madgwick filter, performs effectively in estimating knee joint angles during movement. However, slight drift in the estimation was observed, despite the theoretical robustness of the Madgwick algorithm to such errors. This drift could be attributed to several factors the first of which is that the way in which the algorithm is implemented assumes that the local coordinate axes of the IMUs are perfectly aligned with the anatomical knee joint axis. Any misalignment introduces errors in the computed knee angle, as the algorithm assumes that the relative orientation of the two IMUs reflects the hinge joint's motion accurately.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.75\linewidth]{images/kneeOrientation.png}
-    \caption{\textbf{a)} Local sensor coordinate axes are not aligned with the physiological axes an dplanes by which the joing anvle, \(\alpha\), is defined \textbf{b)} The coordinates of the joint axis direction (green arrows) and the joint position (blue arrows) in the local coordinate system of the sensors \cite{seel_imu-based_2014}}
+    \caption{\textbf{a)} Local sensor coordinate axes are not aligned with the physiological axes and planes by which the joint angle, \(\alpha\), is defined \textbf{b)} The coordinates of the joint axis direction (green arrows) and the joint position (blue arrows) in the local coordinate system of the sensors \cite{seel_imu-based_2014}}
     \label{fig:enter-label}
 \end{figure}
 
-This issue is further compounded by the possible shifting of the IMUs over time. This poses issues since the initial offset between the IMUs is assumed to be accurately calibrated and constant throghout the session. Additionally the Madgwick filter is not capable of accounting for changes in sensor alignment over time, leading to possible inaccuracies if the IMUs are not secured well enough.
+This issue is further compounded by the possible shifting of the IMUs over time. This poses issues since the initial offset between the IMUs is assumed to be accurately calibrated and constant throughout the session. Additionally the Madgwick filter is not capable of accounting for changes in sensor alignment over time, leading to possible inaccuracies if the IMUs are not secured well enough.
 
-Another related challenge is the implicit assumption that the IMUs are do not experience significant external forces beyond those caused by the forward motion of the leg and gravity. In practice however, accelerometer readings can be affected by transient forces such as those that occurr during foot strikes. These forces may introduce noise into the orientation stimation process, specifically in the correction step of the Madgwick filter, where accelerometer data is used to align the estimated gravity vector with the measured gravity vector.
+Another related challenge is the implicit assumption that the IMUs are do not experience significant external forces beyond those caused by the forward motion of the leg and gravity. In practice however, accelerometer readings can be affected by transient forces such as those that occur during foot strikes. These forces may introduce noise into the orientation estimation process, specifically in the correction step of the Madgwick filter, where accelerometer data is used to align the estimated gravity vector with the measured gravity vector.
 
 Finally there is room for improvement with regards to the validation process itself. The Delsys derived knee angle, although likely more accurate than the In-House version since it has inbuilt sensor fusion algorithms for orientation estimation, is still using IMUs in order to estimate the angle. In order to benchmark in a better manner a goniometer sensor should be used instead or an even more robust sensor system. This could for example be the Xsens system used for validation of the open loop sequence which outputs knee angles without any additional processing necessary, but was regretfully not available during the period in which the knee angle estimation method was to be validated.. 
 
 \subsection{Further Work}
-One of the challenges encountered when implementing a knee angle estimation algorithm is the need for alignment of the sensor frames to the relevant body segments. Although this is in effect implemented in the madgwick filter by .... 
+One of the challenges encountered when implementing a knee angle estimation algorithm is the need for alignment of the sensor frames to the relevant body segments. Although this is in effect implemented in the Madgwick filter by .... 
 
 
 Future work could explore the integration fo real-time alignment correction mechanisms, potentially leveraging additional data sources, such as magnetometers to monitor and adjust sensor alignment continuously.
 
-Further work could involve implementing motion segmentation algorithms to differentate between periods of high and low dynamic activity allowing the algorithm to weigh accelerometer corrections more effectively.
+Further work could involve implementing motion segmentation algorithms to differentiate between periods of high and low dynamic activity allowing the algorithm to weigh accelerometer corrections more effectively.
 
 not implemented here a possible further development would be to implement a sensor-to-segment alignment. Such algorithm can generally be categorized into manual alignment, static pose estimation, functional calibration, deep learning, or some combination of these approaches \cite{rhudy_knee_2024}. For further developing this project a simple static pose such as holding still for 5 to 10s in a specified standing pose could be utilized. The accelerometers would be utilized to detect the gravity vector and thus 
 

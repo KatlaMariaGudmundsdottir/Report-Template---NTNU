@@ -159,3 +159,38 @@ However, there are challenges associated with using the EKF for real-time knee a
 Despite these challenges, the EKF provides a strong balance between accuracy and adaptability, making it a viable choice for knee angle estimation. When magnetometer data is unavailable, as in this case, the filter can still perform effectively by leveraging the complementary strengths of gyroscope and accelerometer data. For systems with limited processing power, however, alternative algorithms such as the Madgwick filter may offer a more computationally efficient solution.
 
 The EKF’s ability to integrate sensor data in a probabilistic framework ensures that it remains a cornerstone of orientation estimation techniques, particularly in applications requiring dynamic motion tracking. Properly implemented and tuned, it is capable of providing reliable orientation estimates critical for computing knee angles in real-time functional electrical stimulation systems.
+
+
+
+
+
+\subsubsection{Simplified Curve}
+The first mathematical representation of the
+The resulting curve modeled as the sum of two sinusoidal components, defined as:
+\[
+y(x) =
+\begin{cases}
+A_1 \sin\left(2 \pi f_1 x + \phi_1\right) + C_1, & 0 \leq x \leq 40 \\
+A_2 \sin\left(2 \pi f_2 x + \phi_2\right) + C_2, & x > 40
+\end{cases}
+\]
+where the parameters are defined as:
+
+For the first bump:
+\[
+A_1 = 11, \quad f_1 = \frac{0.1}{4}, \quad \phi_1 = \frac{\pi}{2} + 2\pi f_1 \cdot 20, \quad C_1 = 15
+\]
+
+For the second bump:
+\[
+A_2 = 30, \quad f_2 = \frac{0.1}{6}, \quad \phi_2 = -\frac{\pi}{2} + 2\pi f_2 \cdot 80, \quad C_2 = 34
+\]
+
+
+A visualization of this curve can be seen in figure \ref{fig:simplecurve}. When comparing this however with the typical knee angle curve there are some major differences such as the height of the end of the second sinus curbe and height of the valley between the two curves. Because of these discrepancies another approach was attempted.
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/simpleKneeAngle.png}
+    \caption{Simplified knee angle curve during gait, created by combining two sinusoids}
+    \label{fig:simplecurve}
+\end{figure}
