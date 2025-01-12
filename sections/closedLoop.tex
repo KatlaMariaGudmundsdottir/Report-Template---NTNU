@@ -50,12 +50,20 @@ The closed loop implementation was tested on a single healthy subject at two dif
 \newpage
 \subsection{Closed-Loop Design}
 \lhead{Closed-Loop FES Control - Closed-Loop Design}
+
+\subsubsection{PI controller}
 The selection of the control approach began with an evaluation of various linear control methods, ultimately leading to the choice of a PI controller. A proportional-only controller was deemed insufficient because, while it responds to instantaneous errors, it cannot adequately address steady-state errors. The addition of an integral term, which accumulates error over time, allows the PI controller to effectively compensate for consistent offsets (e.g., under- or over-stimulation) that the proportional term alone cannot eliminate.
 
 In a FES system, delays in muscle activation and mechanical response can cause the actual knee angle to lag behind the desired reference. By including an integral term the controller accounts for these delays indirectly: if the knee angle lags due to delayed muscle response, the accumulated error prompts the system to apply a sustained correction to minimize the offset over time.
 
 The decision to exclude a derivative term was based on its potential impact on system stability. While a derivative term could theoretically improve responsiveness to rapid changes, it would also amplify the noise from IMU measurements and knee angle calculations, risking control loop instability.
 
+\subsubsection{Feedforward Current}
+It was decided that feedforward element would also be included. Feedforward current was thought to be particularly beneficial in FES systems because it provides a consistent baseline for muscle activation, reducing reliance on reactive feedback adjustments and ensuring smoother, more predictable responses during the gait cycle. It also helps address delays in muscle activation and mechanical response by ensuring timely stimulation even before feedback corrections take effect. Additionally, the feedforward current reduces the workload on the feedback controller by offloading the need for large corrective actions requiring large gain values, allowing the controller to focus on fine-tuning adjustments.
+
+Finally the feedforward current contributes to minimizing muscle fatigue by ensuring that the stimulation is applied more evenly over time. This reduces the need for large corrective currents, which could otherwise lead to over-stimulation and discomfort.
+
+\subsubsection{Overall Design}
 \begin{figure} [h]
     \centering
     \includegraphics[width=1.1\linewidth]{images/controldiam3.png}
@@ -78,6 +86,12 @@ Then for each muscle that should be stimulated, a PI controller, specifically tu
 \lhead{Closed-Loop FES Control - Knee Angle Reference Design}
 Two approaches were compared to design the mathematical representation of the knee angle reference curve. First a simple hand-tuned combination of sinusoids, and thereafter a Fourier fitted curve.
 \subsubsection{Simplified Curve}
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/bigfinalref.png}
+    \caption{Simplified knee angle curve during gait, created by combining two sinusoids}
+    \label{fig:simplecurve}
+\end{figure}
 The first mathematical representation of the
 The resulting curve from combining two simple sinusoids and hand-tuning parameters is defines as:
 \[
@@ -98,12 +112,7 @@ For the second bump:
 \[
 A_2 = 30, \quad f_2 = \frac{0.1}{6}, \quad \phi_2 = -\frac{\pi}{2} + 2\pi f_2 \cdot 80, \quad C_2 = 34
 \]
-\begin{figure} [H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/simpleKneeAngle.png}
-    \caption{Simplified knee angle curve during gait, created by combining two sinusoids}
-    \label{fig:simplecurve}
-\end{figure}
+
 
 A visualization of this curve is shown in Figure \ref{fig:simplecurve}. However, when compared to the typical knee angle curve, significant differences were observed, such as the height of the second sinus curve's peak and the depth of the valley between the two curves.
 
@@ -112,28 +121,28 @@ A visualization of this curve is shown in Figure \ref{fig:simplecurve}. However,
 The final, more complex, fitted curve is plotted alongside the original data in figure \ref{fig:kneeangleref}, illustrating how well the Fourier series captures the periodic behavior of the knee angle during gait. Its improved resemblance to a physiological knee angle curve, combined with the minimal increase in computational complexity, made it the preferred choice for the closed-loop implementation.
 \begin{figure} [H]
     \centering
-    \includegraphics[width=0.99\linewidth]{images/goodkneeangleref.png}
+    \includegraphics[width=0.85\linewidth]{images/bigfittedcurve.png}
     \caption{Fitted Fourier series curve plotted alongside goniometer knee angle data during gait from \cite{camargo_comprehensive_2021}}
     \label{fig:kneeangleref}
 \end{figure}
 \begin{figure} [H]
     \centering
-    \includegraphics[width=0.85\linewidth]{images/fittedKneeAngleRef.png}
+    \includegraphics[width=0.75\linewidth]{images/bigfinalref.png}
     \caption{Final reference curve, obtained by fitting a Fourier series to knee angle data}
     \label{fig:enter-label}
 \end{figure}
-\todo{fix figure}
 
 
 \subsection{Implementation}
+In order to realize the final system, each component of the closed-loop in figure \ref{fig:cldiam} was implemented in turn.
 \lhead{Closed-Loop FES Control - Implementation}
 \subsubsection{Knee Angle Reference}
-In order to use the fitted curve as the reference for the PI controller, the knee angle corresponding to the current percentage of the gait cycle must be extracted in real time. This process begins by determining which percentage of the gait cycle the system is currently in. This is calculated using the current time and the gait cycle duration set by the user. The corresponding knee angle is then retrieved from the fitted curve. Which is then fed to the PI controller.
+In order to use the fitted curve as the reference for the PI controller, the knee angle corresponding to the current percentage of the gait cycle must be extracted in real time. This process begins by determining which percentage of the gait cycle the system is currently in. This is calculated using the current time and the gait cycle duration set by the user. The corresponding knee angle is then retrieved from the fitted curve. Which is, in turn, fed to the PI controller.
 
 \subsubsection{Gait Cycle Duration}
-As mentioned the reference knee angle degree value depends on the gait cycle duration and current time, therefore setting the correct gait cycle duration for each user is an important step. Gait cycle duration defines the time required for one complete stride, encompassing the full sequence of movements from both legs. 
+The reference knee angle value depends on the gait cycle duration, making it essential to determine the correct duration for each user. The gait cycle duration represents the time required for one complete stride, including the full sequence of movements from both legs.
 
-When running the FES experiments on a treadmill this gait cycle duration will vary from user to user and is therefore important to calculate before starting the stimulation. The primary input is the treadmill speed (\(v\)) in (m/s). The second essential parameter is the subjects leg length (\(L\)), measured as the distance from the greater trochanter to the floor in meters \cite{meinders_how_2021}. Then the Froude number (\(Fr)\) which is a widely used descriptor in gait analysis is:
+During FES experiments on a treadmill, the gait cycle duration varies between users and must be calculated before starting stimulation. The primary input is the treadmill speed (\(v\)) in (m/s). The second essential parameter is the subjects leg length (\(L\)), measured as the distance from the greater trochanter to the floor in meters \cite{meinders_how_2021}. Using these inputs, the Froude number \(Fr\), a widely used descriptor in gait analysis, is calculated as:
 \begin{equation}
     Fr = \frac{v^2}{g \cdot L}
 \end{equation}
@@ -141,7 +150,7 @@ Where g is gravitational acceleration. Once the Froude number is calculated the 
 \begin{equation}
     f_s = \sqrt{\frac{g \cdot Fr}{L}}
 \end{equation}
-From which the gait cycle duration is extracted and inserted into the program to ensure that the closed loop runs on a gait cycle duration that is comfortable for the user.
+From the stride frequency, the gait cycle duration is extracted and inserted into the program to ensure that the closed loop runs on a gait cycle duration that is comfortable for the user.
 
 \subsubsection{PI controller}
 To dynamically adjust the current amplitude based on the error between the desired and actual knee angle, a proportional-integral (PI) controller was implemented and tuned for each muscle independently. 
@@ -155,12 +164,13 @@ K_p \cdot e(t) + K_i \cdot \frac{\Delta t}{2} \left(e(t) + e(t-\Delta t)\right),
 \end{cases}
 \end{equation}
 
-Where \( e(t-\Delta t) \) is the error at the previous time step. As is clear from the formula the integral term is calculated using trapezoidal integration. By averaging the error values at the start and end of the interval the trapezoidal approach better captures the varying nature of the error compared to rectangular integration which assumes that the error remains constant during the interval \(\delta t\). It also reduces the likelihood of abrupt changes to the PI output since it accounts for error trends between time steps rather than using just the current error.
+Where \( e(t-\Delta t) \) is the error at the previous time step. The integral term is computed using trapezoidal integration, which averages the error values at the start and end of the interval. This approach captures the varying nature of the error more accurately than rectangular integration, which assumes a constant error during 
+\(\delta t\). It also smooths the PI output by accounting for error trends between time steps, reducing abrupt changes.
 
-The PI controller also incorporates a phase-specific adaptation. This is because in knee extension increasing the stimulation of the extensor muscles decreases the knee angle, while increased stimulation of flexion muscles will increase the knee angle. To prevent counterproductive stimulation the controller therefor inverts its output during extension.
+The PI controller includes phase-specific adaptation to account for the opposing effects of muscle stimulation. Stimulating the extensor muscles decreases the knee angle, while stimulating the flexor muscles increases it. To avoid counterproductive stimulation, the controller inverts its output during the extension phase.
 
 \subsubsection{Feedforward Current}
-A feedforward current is implemented for each muscle individually to provide a baseline stimulation amplitude, ensuring sufficient activation to induce movement. It is set around the midpoint between the motor threshold and the maximum tolerable intensity found for each muscle during setup. 
+A feedforward current is implemented for each muscle individually to provide a baseline stimulation amplitude. It is set around the midpoint between the motor threshold and the maximum tolerable intensity found for each muscle during setup. 
 
 \begin{figure}
     \centering
@@ -169,19 +179,15 @@ A feedforward current is implemented for each muscle individually to provide a b
     \label{fig:clsetup}
 \end{figure}
 
-Including a feedforward current is particularly beneficial in FES systems because it provides a consistent baseline for muscle activation reducing reliance on reactive feedback adjustments and ensuring smoother, more predictable responses during the gait cycle. It also helps address delays in muscle activation and mechanical response by ensuring timely stimulation even before feedback corrections take effect. Additionally, the feedforward current reduces the workload on the feedback controller by offloading the need for large corrective actions requiring large gain values, allowing the controller to focus on fine-tuning adjustments.
-
-Finally the feedforward current contributes to minimizing muscle fatigue by ensuring that the stimulation is applied more evenly over time. This reduces the need for large corrective currents, which could otherwise lead to over-stimulation and discomfort.
-
 \subsubsection{Current Saturation}
-The final calculated current is the sum of the feedforward current and the PI computed current saturated for safety reasons. The maximum possible current amplitude is the maximum tolerable intensity found during the setup and is set for each muscle individually. This saturated current is sent to the StimWave which then applies the stimulation with the set current amplitude, frequency and pulse width to the electrodes for each active muscle.
+The final calculated current is the sum of the feedforward current and the PI computed current saturated for safety reasons. The maximum possible current amplitude is the maximum tolerable intensity found during the setup and is set for each muscle individually. 
 
 \subsection{Results}
 \lhead{Closed-Loop FES Control - Results}
 \subsubsection{Slower Speed}
 During the slower speed stimulation the following parameters were tuned and used on the subject:
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \caption{Closed Loop Parameters for 0.8km/h}
 \begin{tabular}{|l|c|c|c|c|c|}
@@ -194,6 +200,8 @@ Hamstring          & 35 & 50 & 0.4 & 0.05 \\ \hline
 \end{tabular}
 \label{tab:closed_loop_9}
 \end{table}
+
+Figure \ref{fig:cl9ref} illustrates the results of applying stimulation while the subject walks on a treadmill, showing how the knee angle measured by the in-house-developed IMUs aligns with the reference knee angle. The stimulation applied to each muscle is displayed in Figure \ref{fig:cl9stim}.
 
 \begin{figure} [H]
     \centering
@@ -211,11 +219,11 @@ Hamstring          & 35 & 50 & 0.4 & 0.05 \\ \hline
 
 Based on the results seen in figure \ref{fig:cl9ref} and \ref{fig:cl9stim}, the closed loop control system demonstrates a reasonable ability to follow the major peaks and valleys of the reference knee angle trajectory at the slower speed of 0.8 km/h. The measured knee angle aligns well with the timing and amplitude of the primary peaks. 
 
-However, the system struggles to replicate the smaller peaks and subtler variations in the reference trajectory. This discrepancy could can be attributed to limitations in the PI controls responsiveness to small variations in reference knee angle and delay in muscle response. This issue might however be possible to mitigate by further tuning of the gains. As can be observed in figure \ref{fig:cl9stim} the variation in stimulation amplitude is not very large, indicating that there is room for increasing the gains and thus the variation in intensity.  
+However, the system struggles to replicate the smaller peaks and subtler variations in the reference trajectory. This discrepancy could can be attributed to limitations in the PI controls responsiveness to small variations in the reference and delay in muscle response. This issue might however be mitigated by further tuning of the gains. As shown in figure \ref{fig:cl9stim} the variation in stimulation amplitude is not very large, suggesting there is room to increase the gains and enhance the system's responsiveness.
 
-Notably, there is minimal delay observed between the initiation of the initial spike in the reference signal and the corresponding response in the measured knee angle. This highlights the control systems rapid reaction time, which is crucial for maintaining synchronization with the reference gait pattern.
+Notably, there is minimal delay observed between the initiation of the initial spike in the reference signal and the corresponding response in the measured knee angle. This demonstrates the control system's rapid reaction time, essential for maintaining synchronization with the reference gait pattern.
 
-\todo{talk more about the stimulation and compare with open loop stimulation}
+
 
 \subsubsection{Faster Speed}
 During the faster speed (1.5km/h) the following parameters were tuned and used on the subject:
